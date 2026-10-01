@@ -17,12 +17,16 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "fixtures": "node scripts/generate-fixtures.mjs",
-    "test": "npm run build && npm run typecheck && npm run test:web",
+    "test": "npm run build && npm run typecheck && npm run test:web && npm run test:app",
     "test:web": "playwright test",
     "test:web:ui": "npm run build && playwright test --ui",
     "prepack": "npm run build",
     "test:report": "playwright show-report",
-    "test:serve": "vite --config tests/web/vite.config.ts"
+    "test:serve": "vite --config tests/web/vite.config.ts",
+    "app:dev": "npm run build && vite --config apps/studio/vite.config.ts",
+    "app:build": "npm run build && vite build --config apps/studio/vite.config.ts",
+    "app:preview": "vite preview --config apps/studio/vite.config.ts",
+    "test:app": "npm run app:build && playwright test --config playwright.app.config.ts"
   },
   "engines": {
     "node": ">=22.12.0"

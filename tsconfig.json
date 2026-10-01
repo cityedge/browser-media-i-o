@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "types": ["node", "@types/dom-webcodecs"]
   },
-  "include": ["src/**/*.ts", "examples/**/*.ts", "playwright.config.ts", "tests/**/*.ts", "scripts/**/*.mjs"]
+  "include": ["src/**/*.ts", "examples/**/*.ts", "playwright.config.ts", "tests/**/*.ts", "scripts/**/*.mjs", "apps/**/*.ts", "playwright.app.config.ts"]
 }

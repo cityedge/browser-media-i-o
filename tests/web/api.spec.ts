@@ -142,6 +142,38 @@ test('renderer cancellation aborts its destination and never reports completion'
   expect(result.progress).not.toContain('complete');
 });
 
+test('cancelling during AAC initialization settles the pending write and allows another export', async ({ page }) => {
+  const results = await page.evaluate(async () => {
+    const { api } = window.mediaHarness;
+    await api.enableAacFallback({ width: 320, height: 180 });
+    const results = [];
+    const audio = new AudioBuffer({ length: 4800, sampleRate: 48000, numberOfChannels: 2 });
+    for (const mode of ['signal', 'cancel']) {
+      const controller = new AbortController();
+      const writer = await api.createMp4Writer({ width: 320, height: 180, fps: 30,
+        audio: { sampleRate: 48000, channels: 2 }, signal: controller.signal });
+      const canvas = new OffscreenCanvas(320, 180);
+      canvas.getContext('2d')!.fillRect(0, 0, 320, 180);
+      await writer.addVideoFrame(canvas);
+      // addAudio enters the real encoder's asynchronous initialization before cancellation.
+      const writing = writer.addAudio(audio).then(() => 'completed', (error: { code: string }) => error.code);
+      if (mode === 'signal') controller.abort();
+      await writer.cancel();
+      let timeout: ReturnType<typeof setTimeout>;
+      const code = await Promise.race([writing, new Promise<string>(resolve => { timeout = setTimeout(() => resolve('pending'), 1500); })]);
+      clearTimeout(timeout!);
+      results.push({ mode, code, state: writer.state });
+    }
+    const recovery = await api.renderMp4({ width: 320, height: 180, fps: 30, duration: .1, audio,
+      renderFrame: ctx => ctx.fillRect(0, 0, 320, 180) });
+    return { results, recoveryFrames: recovery.videoFrames };
+  });
+  expect(results).toEqual({ results: [
+    { mode: 'signal', code: 'ABORTED', state: 'cancelled' },
+    { mode: 'cancel', code: 'ABORTED', state: 'cancelled' },
+  ], recoveryFrames: 3 });
+});
+
 test('bad arguments, output limits, destination failures and frame ownership are explicit', async ({ page }) => {
   const result = await page.evaluate(async () => {
     const { api } = window.mediaHarness;

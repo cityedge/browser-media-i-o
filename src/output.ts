@@ -63,6 +63,7 @@ export class Mp4Writer {
   #destinationEnded = false;
   #state: 'open' | 'finalizing' | 'finished' | 'cancelled' | 'failed' = 'open';
   #cancelPromise?: Promise<void>;
+  #pendingBackend?: Promise<void>;
   #busy = false;
   #videoFrames = 0;
   #audioSamples = 0;
@@ -131,12 +132,22 @@ export class Mp4Writer {
       throw mediaError(error, 'ENCODE_FAILED');
     } finally { this.#busy = false; }
   }
+  async #backend(operation: Promise<void>): Promise<void> {
+    this.#pendingBackend = operation;
+    try { await operation; }
+    finally { if (this.#pendingBackend === operation) this.#pendingBackend = undefined; }
+  }
   async #stop(state: 'cancelled' | 'failed') {
     if (this.#state === 'finished') return;
     if (this.#cancelPromise) return this.#cancelPromise;
     this.#state = state;
     this.#snapshot.signal?.removeEventListener('abort', this.#onAbort);
+    const pending = this.#pendingBackend;
     this.#cancelPromise = (async () => {
+      // The AAC extension terminates its worker on close without settling an in-flight init.
+      // Stop accepting data immediately, but let that operation settle before tearing it down.
+      // This also avoids closing a native encoder while a producer is awaiting its queue.
+      try { await pending; } catch { /* Preserve the original failure. */ }
       try { await this.#output.cancel(); } catch { /* Preserve the original failure. */ }
       try { await this.#endDestination(true); } catch { /* Preserve the original failure. */ }
       finally { this.#store?.clear(); }
@@ -145,7 +156,7 @@ export class Mp4Writer {
   }
   /** @internal */
   async initialize() {
-    await this.#run(async () => { await this.#output.start(); this.#check(); });
+    await this.#run(async () => { await this.#backend(this.#output.start()); this.#check(); });
     return this;
   }
   async addVideoFrame(source: CanvasImageSource): Promise<void> {
@@ -156,7 +167,7 @@ export class Mp4Writer {
         frameTiming(this.#videoFrames, o.fps));
       try {
         if (sample.displayWidth !== o.width || sample.displayHeight !== o.height) fail('INVALID_ARGUMENT', 'Frame dimensions must match the output dimensions.');
-        await this.#video.add(sample, { keyFrame: this.#videoFrames % Math.max(1, Math.round(frameRateValue(o.fps) * 2)) === 0 });
+        await this.#backend(this.#video.add(sample, { keyFrame: this.#videoFrames % Math.max(1, Math.round(frameRateValue(o.fps) * 2)) === 0 }));
         this.#check(); this.#videoFrames++; this.#progress('encoding');
       } finally { sample.close(); }
     });
@@ -177,7 +188,7 @@ export class Mp4Writer {
         for (let c = 0; c < config.channels; c++) pcm.set(buffer.getChannelData(c).subarray(offset, offset + length), c * length);
         const sample = new AudioSample({ data: pcm, format: 'f32-planar', sampleRate: config.sampleRate,
           numberOfChannels: config.channels, timestamp: (this.#audioSamples - this.#audioPriming) / config.sampleRate });
-        try { await this.#audio.add(sample); this.#check(); this.#audioSamples += length; }
+        try { await this.#backend(this.#audio.add(sample)); this.#check(); this.#audioSamples += length; }
         finally { sample.close(); }
       }
       this.#progress('encoding');
@@ -193,7 +204,7 @@ export class Mp4Writer {
       }
       this.#progress('finalizing');
       this.#check(); this.#state = 'finalizing';
-      await this.#output.finalize();
+      await this.#backend(this.#output.finalize());
       checkAbort(o.signal);
       if (this.#state !== 'finalizing') fail('ABORTED', 'The writer was cancelled during finalization.');
       this.#state = 'finished';

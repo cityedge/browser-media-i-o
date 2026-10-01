@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <link rel="icon" href="data:," />
+    <title>Framecraft — 素材からMP4へ</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">▣</span> Framecraft</a
+      ><span class="tag">Browser Media I/O · 評価用アプリ</span
+      ><span class="local"><i></i> ブラウザ内で処理</span>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">A SMALL VIDEO STUDIO</p>
+          <h1>素材を、ひとつの動画に。</h1>
+          <p class="lead">画像や動画に、音と字幕を添えて。あなたのブラウザでMP4を作れます。</p>
+        </div>
+        <button id="demo" class="secondary">サンプルを試す <span aria-hidden="true">↗</span></button>
+      </section>
+      <div class="workspace">
+        <section class="materials panel" aria-labelledby="materials-title">
+          <div class="panel-title">
+            <h2 id="materials-title">素材</h2>
+            <span>01 — 03</span>
+          </div>
+          <fieldset id="materials-controls">
+            <div class="material">
+              <div class="step-title">
+                <span class="step">01</span><label for="visual">背景の画像・動画</label>
+              </div>
+              <label class="file-box" for="visual"
+                ><span class="file-icon" aria-hidden="true">▧</span><strong>ファイルを選択</strong
+                ><span>PNG / JPEG / WebP / MP4</span
+                ><input id="visual" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,.mp4"
+              /></label>
+              <p id="visual-info" class="file-info">未選択 · グラフィック背景を使用</p>
+              <button id="clear-visual" class="text-button" type="button" hidden>背景を外す</button>
+            </div>
+            <div class="material">
+              <div class="step-title">
+                <span class="step">02</span><label for="sound">音源 <small>任意</small></label>
+              </div>
+              <label class="file-box compact" for="sound"
+                ><span class="file-icon" aria-hidden="true">♫</span><strong>音源を選択</strong
+                ><span>MP3 / WAV / M4A</span
+                ><input id="sound" type="file" accept="audio/mpeg,audio/wav,audio/mp4,.mp3,.wav,.m4a"
+              /></label>
+              <p id="sound-info" class="file-info">未選択 · 動画に音声があれば使用</p>
+              <button id="clear-sound" class="text-button" type="button" hidden>追加した音源を外す</button>
+            </div>
+            <div class="material">
+              <div class="step-title">
+                <span class="step">03</span><label for="subtitles">字幕 <small>任意</small></label>
+              </div>
+              <input
+                id="srt-file"
+                type="file"
+                accept=".srt,text/plain"
+                aria-label="SRTファイルを選択"
+              /><textarea
+                id="subtitles"
+                rows="4"
+                spellcheck="false"
+                placeholder="SRTを貼り付けるか、ファイルを選択&#10;&#10;1&#10;00:00:00,000 --> 00:00:03,000&#10;最初の字幕"
+              ></textarea>
+              <p id="subtitle-info" class="file-info">字幕なし</p>
+            </div>
+          </fieldset>
+          <p class="privacy">素材はサーバーに送信しません。<br />読み込みと書き出しはこの端末で行います。</p>
+        </section>
+        <div class="stage-column">
+          <section class="panel preview-panel" aria-labelledby="preview-title">
+            <div class="panel-title">
+              <h2 id="preview-title">プレビュー</h2>
+              <span id="preview-size">1280 × 720</span>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="preview" width="1280" height="720" aria-label="出力動画のプレビュー"></canvas>
+            </div>
+            <div class="transport">
+              <button id="play" class="play-button" aria-label="プレビュー再生">▶</button
+              ><output id="time" aria-live="off">0:00.000</output
+              ><input
+                id="seek"
+                aria-label="プレビュー位置"
+                type="range"
+                min="0"
+                max="10"
+                step="0.001"
+                value="0"
+              /><output id="end-time" aria-live="off">0:10.000</output>
+            </div>
+            <p class="preview-hint">再生は確認用です。書き出し時は各フレームを順番に描画します。</p>
+          </section>
+          <section class="panel export-panel" aria-labelledby="export-title">
+            <div class="panel-title">
+              <h2 id="export-title">MP4に書き出す</h2>
+              <span>H.264 + AAC</span>
+            </div>
+            <fieldset id="export-controls" class="settings">
+              <label
+                >解像度<select id="size">
+                  <option value="1280x720">1280 × 720 · HD</option>
+                  <option value="1920x1080">1920 × 1080 · Full HD</option>
+                  <option value="640x360">640 × 360 · 軽量</option>
+                  <option value="320x180">320 × 180 · 検証用</option>
+                </select></label
+              ><label
+                >フレームレート<select id="fps">
+                  <option value="30">30 fps</option>
+                  <option value="24">24 fps</option>
+                  <option value="60">60 fps</option>
+                </select></label
+              ><label
+                >長さ（秒）<input id="duration" type="number" min="0.1" max="600" step="0.001" value="10"
+              /></label>
+            </fieldset>
+            <p class="setting-note">
+              音源を選ぶと実サンプル数から長さを設定します。長さは変更できます。背景は全体を表示し、動画の終端後は最後のフレームを保持します。
+            </p>
+            <div class="export-actions">
+              <span id="estimate">300 frames · 10.000 秒</span
+              ><button id="render" class="primary">MP4を書き出す <span aria-hidden="true">↓</span></button
+              ><button id="cancel" class="secondary" hidden>中止する</button>
+            </div>
+            <progress id="progress" max="1" value="0" aria-label="書き出し進捗" hidden></progress>
+            <p id="status" role="status" aria-label="処理状況" aria-live="polite">
+              素材を選ぶか、サンプルで試してみてください。
+            </p>
+            <p id="error" role="alert" hidden></p>
+            <div id="result" hidden>
+              <a id="download" class="download" download="framecraft.mp4">MP4をダウンロード ↓</a>
+              <p id="result-info"></p>
+              <video id="result-video" controls playsinline aria-label="書き出した動画"></video>
+            </div>
+          </section>
+          <details class="panel diagnostics">
+            <summary>読み込み情報・評価レポート <span>実測値を確認</span></summary>
+            <p>
+              ヘッダー・パケット走査・音声の実サンプル数を分けて表示します。レポートに素材の内容やファイル名は含めません。
+            </p>
+            <pre id="diagnostics">素材を読み込むと情報を表示します。</pre>
+            <button id="report" class="secondary">評価レポートを保存</button>
+          </details>
+        </div>
+      </div>
+      <footer>
+        <span
+          >Framecraft / evaluation app 01 ·
+          <a
+            href="https://github.com/cityedge/codex_work_01/blob/main/THIRD_PARTY_NOTICES.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >ライセンス</a
+          ></span
+        ><span>推奨: デスクトップ Chrome・Edge · 最大10分 / 音声PCM 256 MiB / 出力256 MiB</span>
+      </footer>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
