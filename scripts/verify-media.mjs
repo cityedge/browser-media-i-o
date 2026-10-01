@@ -10,7 +10,7 @@ export function probe(file) {
 }
 
 // This oracle never uses the browser adapter to inspect its output.
-export function verifyMedia(file, audioCodec) {
+export function verifyMedia(file, audioCodec, { pulseTolerance = 0.025 } = {}) {
   const info = probe(file);
   const video = info.streams.find(s => s.codec_type === 'video');
   const audio = info.streams.find(s => s.codec_type === 'audio');
@@ -53,7 +53,7 @@ export function verifyMedia(file, audioCodec) {
   const samples = pcm.length / (truth.channels * 4);
   assert.ok(Math.abs(samples - truth.sampleCount) <= truth.sampleRate * 0.05, `Audio length: ${samples} samples`);
   const starts = [];
-  const bin = 240; // 5 ms windows; allow 25 ms for codec delay/padding in this baseline.
+  const bin = 240; // 5 ms windows; callers can require a tighter output synchronization bound.
   for (let c = 0; c < truth.channels; c++) {
     const channelStarts = [];
     let active = false;
@@ -67,7 +67,7 @@ export function verifyMedia(file, audioCodec) {
     }
     assert.equal(channelStarts.length, truth.pulses[c].length, `Channel ${c}: pulse count`);
     for (let i = 0; i < channelStarts.length; i++) {
-      assert.ok(Math.abs(channelStarts[i] - truth.pulses[c][i]) <= 0.025, `Channel ${c}, pulse ${i}: A/V sync error`);
+      assert.ok(Math.abs(channelStarts[i] - truth.pulses[c][i]) <= pulseTolerance + 1e-9, `Channel ${c}, pulse ${i}: A/V sync error`);
     }
     starts.push(channelStarts);
   }

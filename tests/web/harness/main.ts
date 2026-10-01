@@ -1,148 +1,105 @@
-// Test-only reference adapter. Replace this boundary with the original library when it exists.
-// Mediabunny is used only to exercise the browser and container pipeline at this stage.
-import {
-  ALL_FORMATS, Input, BlobSource, VideoSampleSink, AudioSampleSink,
-  Output, Mp4OutputFormat, BufferTarget, VideoSampleSource, AudioSampleSource,
-  EncodedAudioPacketSource, EncodedPacketSink, canEncodeVideo, canEncodeAudio,
-} from 'mediabunny';
+// Tests consume the built package through its public exports, just like an application.
+import { getCapabilities, openMedia, probe, decodeAudio, renderMp4, createMp4Writer, frameTime, MediaError,
+  type ExportProgress, type PositionedWrite } from 'browser-media-io';
+import { enableAacFallback } from 'browser-media-io/aac';
 
-async function open(url: string) {
+async function file(url: string) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Fixture request failed: ${response.status} ${url}`);
-  return new Input({ source: new BlobSource(await response.blob()), formats: ALL_FORMATS });
+  return response.blob();
 }
-
 async function capabilities() {
-  return {
-    adapter: 'reference-mediabunny',
-    userAgent: navigator.userAgent,
-    secureContext: isSecureContext,
-    h264Encode: await canEncodeVideo('avc', { width: 320, height: 180, bitrate: 1_000_000 }),
-    aacEncode: await canEncodeAudio('aac', { sampleRate: 48000, numberOfChannels: 2, bitrate: 192_000 }),
-    opusEncode: await canEncodeAudio('opus', { sampleRate: 48000, numberOfChannels: 2, bitrate: 192_000 }),
-  };
+  return { adapter: 'browser-media-io@0.1.0', userAgent: navigator.userAgent,
+    ...await getCapabilities({ width: 320, height: 180, videoBitrate: 1_000_000 }) };
 }
-
+function identify(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+  const pixels = context.getImageData(0, 0, 320, 180).data;
+  let id = 0;
+  for (let bit = 0; bit < 10; bit++) if (pixels[(32 * 320 + 16 + bit * 24 + 12) * 4] > 128) id |= 1 << bit;
+  return id;
+}
+function save(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob), link = document.createElement('a');
+  link.href = url; link.download = name; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
 async function inspect(url: string, times: number[]) {
-  const input = await open(url);
+  const input = await openMedia(await file(url));
   try {
-    const video = await input.getPrimaryVideoTrack();
-    const audio = await input.getPrimaryAudioTrack();
-    if (!video || !audio) throw new Error('Fixture must have video and audio');
-    const canvas = document.createElement('canvas');
-    canvas.width = await video.getDisplayWidth();
-    canvas.height = await video.getDisplayHeight();
-    const context = canvas.getContext('2d', { willReadFrequently: true })!;
-    const sink = new VideoSampleSink(video);
+    const info = await input.probe();
+    const video = info.tracks.find(t => t.kind === 'video')!, audio = info.tracks.find(t => t.kind === 'audio')!;
+    const canvas = new OffscreenCanvas(320, 180), context = canvas.getContext('2d', { willReadFrequently: true })!;
     const frames = [];
     for (const time of times) {
-      const sample = await sink.getSample(time);
-      if (!sample) throw new Error(`No frame at ${time}`);
-      try {
-        sample.draw(context, 0, 0);
-        const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-        let id = 0;
-        for (let bit = 0; bit < 10; bit++) {
-          if (pixels[(32 * canvas.width + 16 + bit * 24 + 12) * 4] > 128) id |= 1 << bit;
-        }
-        frames.push({ requested: time, timestamp: sample.timestamp, duration: sample.duration, id });
-      } finally { sample.close(); }
+      const frame = await input.getVideoFrame(time);
+      if (!frame) throw new Error(`No frame at ${time}`);
+      try { frame.draw(context); frames.push({ requested: time, timestamp: frame.timestamp, duration: frame.duration, id: identify(context) }); }
+      finally { frame.close(); }
     }
-    return {
-      metadataDuration: await input.getDurationFromMetadata(),
-      scannedDuration: await input.computeDuration(),
-      width: canvas.width, height: canvas.height,
-      videoCodec: await video.getCodec(), audioCodec: await audio.getCodec(),
-      sampleRate: await audio.getSampleRate(), channels: await audio.getNumberOfChannels(),
-      videoCanDecode: await video.canDecode(), audioCanDecode: await audio.canDecode(), frames,
-    };
-  } finally { input.dispose(); }
+    return { metadataDuration: video.metadataDuration, scannedDuration: info.duration.seconds,
+      width: video.video!.width, height: video.video!.height, videoCodec: video.codec, audioCodec: audio.codec,
+      sampleRate: audio.audio!.sampleRate, channels: audio.audio!.channels, videoCanDecode: video.canDecode, audioCanDecode: audio.canDecode, frames };
+  } finally { input.close(); }
 }
-
-async function decodeAudio(url: string) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Audio fixture request failed: ${response.status}`);
-  const context = new AudioContext({ sampleRate: 48000 });
+function pulseStarts(buffer: AudioBuffer) {
+  return Array.from({ length: buffer.numberOfChannels }, (_, c) => {
+    const values = buffer.getChannelData(c), bin = Math.round(buffer.sampleRate * 0.005), starts: number[] = [];
+    let active = false;
+    for (let offset = 0; offset < values.length; offset += bin) {
+      const end = Math.min(offset + bin, values.length);
+      let sum = 0;
+      for (let i = offset; i < end; i++) sum += values[i] ** 2;
+      const next = Math.sqrt(sum / (end - offset)) > 0.1;
+      if (next && !active) starts.push(offset / buffer.sampleRate);
+      active = next;
+    }
+    return starts;
+  });
+}
+async function readAudio(url: string) {
+  const { buffer, ...result } = await decodeAudio(await file(url));
+  return { ...result, pulseStarts: pulseStarts(buffer) };
+}
+async function roundTrip(url: string, mode: 'encode-opus' | 'encode-aac' | 'native-aac') {
+  const blob = await file(url);
+  const input = await openMedia(blob);
+  const audio = await decodeAudio(blob);
+  let backend = 'native';
+  if (mode === 'encode-aac') backend = await enableAacFallback({ width: 320, height: 180 });
+  const progress: ExportProgress[] = [];
   try {
-    const decoded = await context.decodeAudioData(await response.arrayBuffer());
-    const channels = [];
-    for (let c = 0; c < decoded.numberOfChannels; c++) {
-      const values = decoded.getChannelData(c);
-      const bin = Math.round(decoded.sampleRate * 0.005);
-      const starts: number[] = [];
-      let active = false;
-      for (let offset = 0; offset < values.length; offset += bin) {
-        let sum = 0;
-        const end = Math.min(offset + bin, values.length);
-        for (let i = offset; i < end; i++) sum += values[i] ** 2;
-        const next = Math.sqrt(sum / (end - offset)) > 0.1;
-        if (next && !active) starts.push(offset / decoded.sampleRate);
-        active = next;
-      }
-      channels.push(starts);
-    }
-    return {
-      sampleCount: decoded.length, sampleRate: decoded.sampleRate,
-      channels: decoded.numberOfChannels, duration: decoded.length / decoded.sampleRate,
-      pulseStarts: channels, durationSource: 'decoded-samples',
-    };
-  } finally { await context.close(); }
+    const result = await renderMp4({ width: 320, height: 180, fps: 30, duration: 10, videoBitrate: 1_000_000,
+      audio: audio.buffer, audioCodec: mode === 'encode-opus' ? 'opus' : 'aac',
+      onProgress: item => progress.push(item),
+      renderFrame: async (context, time) => {
+        const frame = await input.getVideoFrame(time);
+        if (!frame) throw new Error(`Missing frame at ${time}`);
+        try { frame.draw(context); } finally { frame.close(); }
+      },
+    });
+    save(result.blob!, `${mode}.mp4`);
+    return { ...result, blob: undefined, audioMode: mode, backend, progress };
+  } finally { input.close(); }
 }
 
-type AudioMode = 'copy-aac' | 'encode-opus' | 'encode-aac';
-async function roundTrip(url: string, audioMode: AudioMode) {
-  const support = await capabilities();
-  if (!support.h264Encode) throw new Error('H.264 encoding is unavailable in this browser');
-  if (audioMode === 'encode-aac' && !support.aacEncode) throw new Error('Native AAC encoding is unavailable in this browser');
-  if (audioMode === 'encode-opus' && !support.opusEncode) throw new Error('Native Opus encoding is unavailable in this browser');
-  const input = await open(url);
-  const target = new BufferTarget();
-  const output = new Output({ format: new Mp4OutputFormat(), target });
-  try {
-    const video = await input.getPrimaryVideoTrack();
-    const audio = await input.getPrimaryAudioTrack();
-    if (!video || !audio) throw new Error('Fixture must have video and audio');
-    const videoSource = new VideoSampleSource({ codec: 'avc', bitrate: 1_000_000, latencyMode: 'quality' });
-    const audioSource = audioMode === 'copy-aac'
-      ? new EncodedAudioPacketSource('aac')
-      : new AudioSampleSource({ codec: audioMode === 'encode-aac' ? 'aac' : 'opus', bitrate: 192_000 });
-    output.addVideoTrack(videoSource, { frameRate: 30 });
-    output.addAudioTrack(audioSource);
-    await output.start();
-    let videoFrames = 0;
-    let audioSamples = 0;
-    // Await each submission and release each decoded frame. No full-video pixel buffer.
-    for await (const sample of new VideoSampleSink(video).samples()) {
-      try { await videoSource.add(sample); videoFrames++; }
-      finally { sample.close(); }
-    }
-    if (audioSource instanceof EncodedAudioPacketSource) {
-      const decoderConfig = await audio.getDecoderConfig();
-      if (!decoderConfig) throw new Error('Missing AAC decoder configuration');
-      for await (const packet of new EncodedPacketSink(audio).packets()) {
-        await audioSource.add(packet, { decoderConfig });
-      }
-    } else {
-      for await (const sample of new AudioSampleSink(audio).samples()) {
-        try { await audioSource.add(sample); audioSamples += sample.numberOfFrames; }
-        finally { sample.close(); }
-      }
-    }
-    await output.finalize();
-    if (!target.buffer) throw new Error('No MP4 was produced');
-    const link = document.createElement('a');
-    const blobUrl = URL.createObjectURL(new Blob([target.buffer], { type: 'video/mp4' }));
-    link.href = blobUrl;
-    link.download = `${audioMode}.mp4`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 10_000);
-    return { videoFrames, audioSamples, audioMode, bytes: target.buffer.byteLength };
-  } catch (error) {
-    if (output.state !== 'finalized') await output.cancel();
-    throw error;
-  } finally { input.dispose(); }
-}
-
-const harness = { capabilities, inspect, decodeAudio, roundTrip };
+const harness = { capabilities, inspect, decodeAudio: readAudio, roundTrip,
+  api: { getCapabilities, openMedia, probe, decodeAudio, renderMp4, createMp4Writer, frameTime, MediaError, enableAacFallback }, file,
+  async synthetic(streaming: boolean) {
+    const audio = await decodeAudio(await file('/reference.wav'));
+    await enableAacFallback({ width: 320, height: 180 });
+    let handle: FileSystemFileHandle | undefined;
+    if (streaming) handle = await (await navigator.storage.getDirectory()).getFileHandle('test-export.mp4', { create: true });
+    const stream = handle ? await handle.createWritable() : undefined;
+    const result = await renderMp4({ width: 320, height: 180, fps: 30, duration: 10, audio: audio.buffer, videoBitrate: 1_000_000,
+      target: stream ? { kind: 'stream', stream: stream as WritableStream<PositionedWrite> } : { kind: 'blob' },
+      renderFrame: (ctx, _time, n) => {
+        ctx.fillStyle = '#333'; ctx.fillRect(0, 0, 320, 180);
+        for (let bit = 0; bit < 10; bit++) { ctx.fillStyle = (n >> bit) & 1 ? '#ebebeb' : '#101010'; ctx.fillRect(16 + bit * 24, 16, 24, 32); }
+      },
+    });
+    save(handle ? await handle.getFile() : result.blob!, 'synthetic.mp4');
+    return { ...result, blob: undefined, streamed: result.blob === null };
+  },
+};
 declare global { interface Window { mediaHarness: typeof harness } }
 window.mediaHarness = harness;

@@ -1,15 +1,26 @@
 {
   "name": "browser-media-io",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Browser media I/O library development and verification workspace",
+  "description": "Browser media probing, decoding and frame-based MP4 rendering",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./aac": { "types": "./dist/aac.d.ts", "import": "./dist/aac.js" }
+  },
+  "files": ["dist", "src", "docs", "examples", "README.md", "LICENSE.md", "THIRD_PARTY_NOTICES.md"],
+  "sideEffects": false,
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "fixtures": "node scripts/generate-fixtures.mjs",
-    "test": "npm run typecheck && npm run test:web",
+    "test": "npm run build && npm run typecheck && npm run test:web",
     "test:web": "playwright test",
-    "test:web:ui": "playwright test --ui",
+    "test:web:ui": "npm run build && playwright test --ui",
+    "prepack": "npm run build",
     "test:report": "playwright show-report",
     "test:serve": "vite --config tests/web/vite.config.ts"
   },
@@ -17,11 +28,20 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
+    "@mediabunny/aac-encoder": "1.61.0",
     "@playwright/test": "1.63.0",
     "@types/dom-webcodecs": "0.1.19",
     "@types/node": "^22.0.0",
-    "mediabunny": "1.61.0",
     "typescript": "5.9.3",
     "vite": "8.3.1"
+  },
+  "dependencies": {
+    "mediabunny": "1.61.0"
+  },
+  "peerDependencies": {
+    "@mediabunny/aac-encoder": "1.61.0"
+  },
+  "peerDependenciesMeta": {
+    "@mediabunny/aac-encoder": { "optional": true }
   }
 }

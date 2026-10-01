@@ -63,7 +63,7 @@ test('decoded MP3 length comes from samples despite a false Xing duration', asyn
   }
 });
 
-const modes = ['copy-aac', 'encode-opus'] as const;
+const modes = ['encode-aac', 'encode-opus'] as const;
 for (const mode of modes) {
   test(`MP4 round trip: re-encode all video frames, audio=${mode}`, async ({ page }, testInfo) => {
     const [download, result] = await Promise.all([
@@ -74,7 +74,9 @@ for (const mode of modes) {
     if (mode === 'encode-opus') expect(result.audioSamples).toBeGreaterThan(0);
     const outputPath = testInfo.outputPath('roundtrip.mp4');
     await download.saveAs(outputPath);
-    const verified = verifyMedia(outputPath, mode === 'copy-aac' ? 'aac' : 'opus');
+    expect(result.progress.at(-1)).toMatchObject({ stage: 'complete', fraction: 1 });
+    for (let i = 1; i < result.progress.length; i++) expect(result.progress[i].fraction!).toBeGreaterThanOrEqual(result.progress[i - 1].fraction!);
+    const verified = verifyMedia(outputPath, mode === 'encode-aac' ? 'aac' : 'opus', { pulseTolerance: 0.005 });
     await testInfo.attach('roundtrip.mp4', { path: outputPath, contentType: 'video/mp4' });
     await testInfo.attach('verification.json', { body: JSON.stringify({ adapter: result, verification: verified }), contentType: 'application/json' });
   });
@@ -84,14 +86,14 @@ for (const mode of modes) {
 if (process.env.TEST_NATIVE_AAC === '1') {
   test('native AAC: MP4 round trip with H.264 and AAC re-encoding', async ({ page }, testInfo) => {
     const capabilities = await page.evaluate(() => window.mediaHarness.capabilities());
-    expect(capabilities.aacEncode, 'This browser/OS must provide a native AAC encoder for this target').toBe(true);
+    expect(capabilities.nativeAacEncode, 'This browser/OS must provide a native AAC encoder for this target').toBe(true);
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.evaluate(() => window.mediaHarness.roundTrip('/reference.mp4', 'encode-aac')),
+      page.evaluate(() => window.mediaHarness.roundTrip('/reference.mp4', 'native-aac')),
     ]);
     const output = testInfo.outputPath('native-aac.mp4');
     await download.saveAs(output);
-    const verified = verifyMedia(output, 'aac');
+    const verified = verifyMedia(output, 'aac', { pulseTolerance: 0.005 });
     await testInfo.attach('verification.json', { body: JSON.stringify(verified), contentType: 'application/json' });
   });
 }

@@ -1,18 +1,81 @@
-# Browser Media I/O
+# Browser Media I/O — 0.1.0
 
-ブラウザ内でのメディア入力・情報取得・MP4出力ライブラリに向けた開発リポジトリです。
-現在は **Playwrightによるテスト基盤** を実装しています。ライブラリ本体・公開APIはまだありません。
+Webアプリに、メディアの **入力・情報取得・MP4出力** を追加するTypeScriptライブラリです。
+ブラウザ内で処理し、画面録画やサーバー側の動画変換を必要としません。
+字幕描画、スペアナ、動画編集、合成などは利用アプリで実装できます。
 
-JIZURAのコードは使用していません。テスト用の入出力アダプターにはMediabunnyを使用しています。
-このアダプターの成功は将来の独自ライブラリの成功を意味しません。本体を実装したら、同じテストに接続して検証します。
+JIZURAのコードは使用していません。独自の公開APIと制御処理を、既存のMediabunnyの
+コンテナ解析・格納／コーデック機能の上に実装しています。
 
-## 実行
+## できること
 
-必要なもの:
+| API | 機能 |
+|---|---|
+| `probe(file)` | MP4/M4A・MP3・WAVのトラック、サイズ、コーデック、時間などを取得 |
+| `openMedia(file)` | 必要な時刻の映像フレーム、必要区間のPCM音声を取得 |
+| `decodeAudio(file)` | 音源を全デコードし、実サンプル数とAudioBufferを取得 |
+| `renderMp4(options)` | 各時刻のCanvas描画と音声から、固定fpsのMP4を生成 |
+| `createMp4Writer(options)` | アプリが用意したフレームとPCMを順に渡してMP4を生成 |
+| `getCapabilities(options)` | 指定条件でのブラウザのエンコード対応を確認 |
 
-- Node.js 22.12以降、npm。
-- FFmpeg／ffprobe。素材生成には `libx264`、`aac`、`libmp3lame` エンコーダーが必要です。
-- Chromium系ブラウザ。H.264エンコード、AACデコード、Opusエンコードが基本テストの前提です。
+長さの情報源はメタデータ・パケット走査・デコード結果を区別します。
+既定のprobeはパケットを走査します。音源の実際の長さは `decodeAudio` が返す
+`sampleCount / sampleRate` から得られます。
+
+映像出力はH.264、音声はAACが既定です。AAC非対応のブラウザでは、明示的に有効化する
+オプションのWASM拡張を使えます。Opusは指定した場合にだけ使います。
+音声なし出力、進捗、キャンセル、Blobの容量制限、直接ファイル保存用ストリームも利用できます。
+
+詳細: [APIと動作契約](docs/API.md) ／ [音源＋Canvasの例](examples/canvas-with-audio.ts) ／ [動画入出力の例](examples/video-roundtrip.ts)
+
+## ビルド・アプリへの組み込み
+
+Node.js 22.12以降を用意してください。このリポジトリはまだnpm公開していません。
+
+```sh
+npm ci
+npm run build
+npm pack
+```
+
+生成されたパッケージを自作アプリにインストールします。
+
+```sh
+npm install /path/to/browser-media-io-0.1.0.tgz
+# ネイティブAAC非対応環境でもAAC出力したい場合のみ
+npm install @mediabunny/aac-encoder@1.61.0
+```
+
+パッケージはES ModulesとTypeScriptの型定義を含みます。React等のフレームワークに依存しません。
+開発・実行対象はHTTPSまたはlocalhostのデスクトップChrome／Edgeです。
+
+```ts
+import { decodeAudio, renderMp4 } from 'browser-media-io';
+import { enableAacFallback } from 'browser-media-io/aac';
+
+const audio = await decodeAudio(audioFile);
+await enableAacFallback({ sampleRate: audio.sampleRate, channels: audio.channels });
+
+const result = await renderMp4({
+  width: 1280, height: 720, fps: 30, duration: audio.duration,
+  audio: audio.buffer,
+  onProgress: ({ fraction }) => console.log(fraction),
+  renderFrame(ctx, time) {
+    ctx.fillStyle = '#152333'; ctx.fillRect(0, 0, 1280, 720);
+    ctx.fillStyle = 'white'; ctx.font = '48px sans-serif';
+    ctx.fillText(`再生位置 ${time.toFixed(2)} 秒`, 80, 120);
+  },
+});
+// result.blob が完成したMP4です。
+```
+
+ネイティブAACだけを使うアプリは `/aac` のimportと有効化を省略できます。
+基本パッケージからAAC拡張を自動ロードすることはありません。
+
+## テスト
+
+FFmpeg／ffprobe（libx264、AAC、libmp3lameが必要）とChromiumを使用します。
+FFmpegは素材生成と独立検証だけに使い、ライブラリの実行時には不要です。
 
 ```sh
 npm ci
@@ -20,89 +83,60 @@ npx playwright install chromium
 npm test
 ```
 
-Linuxでブラウザ実行に必要なOSライブラリが不足する場合は、管理権限のある環境で
-`npx playwright install --with-deps chromium` を実行してください。
-
-ブラウザは、環境変数 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` の指定、Playwrightが管理するブラウザ、
-既存の `/usr/bin/chromium` の順で選びます。既存ブラウザを使う場合は実行時にパスを表示し、
-実際のブラウザバージョンとコーデック対応をレポートに記録します。
+このクラウド環境にはFFmpegとChromiumがあるため、次のコマンドで実行できます。
 
 ```sh
-# このクラウド環境ではChromiumとFFmpegがインストール済みです。
-# npmキャッシュも書き込み可能な場所に置きます。
 npm --cache /tmp/codex-npm-cache ci
 npm test
-
-# 使用するブラウザを明示する場合（POSIXシェル）
-PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm test
 ```
 
-FFmpegの場所は `FFMPEG_PATH`、ffprobeの場所は `FFPROBE_PATH` で指定できます。
-ブラウザへの入力・出力処理にサーバー側のFFmpegは使いません。
-FFmpegは素材生成と独立した検査のためだけに使います。
+ブラウザは `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` の明示指定、Playwright管理ブラウザ、
+既存 `/usr/bin/chromium` の順で選択し、実際のバージョンをレポートへ保存します。
+FFmpeg／ffprobeのパスは `FFMPEG_PATH`／`FFPROBE_PATH` で指定できます。
+LinuxでブラウザのOS依存が不足する場合は `npx playwright install --with-deps chromium` を実行してください。
 
-## 自動テスト
+**テストはビルド済みライブラリの公開APIを使用します。** 基本テスト15件で、以下を検証します。
 
-毎回、10秒・320×180・30fps・300フレームのH.264/AAC素材を生成します。
-各フレームは0〜299を示す二進数の模様を持ち、音声は48kHz・2ch、
-左に1/4/8秒、右に2/5/9秒の短い音を持ちます。入力映像にはBフレームと複数のキーフレームがあります。
-生成条件から作る `manifest.json` が正解です。誤ったメタデータを正解にはしません。
+- 10秒・30fps・300フレームのH.264/AAC素材を毎回生成し、元の生成条件と照合。
+- 全フレームの番号・順序・タイムスタンプと、左右音声の異なる時刻に入れた音を検査。
+- 同じフレーム数でも途中のフレームを複製した出力を、検査器が拒否。
+- メタデータ取得と全パケット走査、前後シーク、フレーム解放、範囲外の取得。
+- 5.016秒と申告するMP3から、10秒・480,000サンプルの音声を取得。
+- 音声区間のサンプル精度の切り出し。
+- MP4の映像・音声を全デコードし、H.264＋AAC（WASM補完）とH.264＋Opusに再エンコード。
+- CanvasとWAVからのMP4生成、Blob保存と実ファイルストリーム保存。
+- 二つの動画を共通の時計で読み、30000/1001fpsで出力。
+- 途中キャンセル、容量超過、書き込み失敗、引数エラー、所有権。
 
-基本テストは7件です。
+独立検査はFFmpeg／ffprobeで実行します。映像時刻の誤差上限は2µs、出力音声マーカーは5ms（入力素材検査は25ms）、
+デコード後音声長は50msを初期基準としています。音声の遅延・パディングを含む許容値で、
+すべての入力に対するサンプル単位の完全一致を保証するものではありません。
 
-1. ブラウザのコーデック対応を取得し、記録する。
-2. 生成した素材をFFmpeg／ffprobeで検証する。
-3. フレーム数が同じでも、途中の1枚を複製した壊れた出力を検査器が拒否する。
-4. MP4の情報取得と、前後に移動する指定時刻のフレーム取得を確認する。
-5. Xingヘッダーのフレーム数を半分にしたMP3で、デコード後のサンプル数と音声の位置を確認する。
-6. 映像を全フレーム再エンコードし、AAC音声は圧縮データのまま保持してMP4を作る。
-7. 映像と音声をデコードし、H.264＋Opusに再エンコードしてMP4を作る。
-
-6はAACエンコードのテストではありません。7はブラウザ内の音声エンコードを含みますが、
-H.264＋AAC出力とは別のテストです。Opus入りMP4の再生互換性も、AAC入りMP4とは異なります。
-
-出力をFFmpegで再デコードし、300枚すべての識別番号・順序を照合します。
-映像タイムスタンプの誤差上限は2µs、音声マーカーの開始時刻は25ms、
-デコード後の音声長は50msです。後者二つは圧縮音声の遅延・パディングを考慮した
-**基盤検証用の許容値**であり、ライブラリの最終的な精度保証ではありません。
-
-音声ヘッダーのテストでは、申告時間と生成元の時間が実際に食い違うことも検査します。
-この素材はブラウザが扱える一例です。あらゆる破損音源の復元を保証するものではありません。
-
-### AAC再エンコードの専用チェック
+Linux版ChromiumのネイティブAACエンコードは非対応ですが、WASM拡張を使用する通常テストではAAC出力まで確認します。
+ネイティブ実装だけを要求する次の専用チェックは、非対応環境では明確に失敗します。
 
 ```sh
-TEST_NATIVE_AAC=1 npx playwright test --grep 'native AAC' --output=test-results/native-aac --reporter=list
+TEST_NATIVE_AAC=1 npx playwright test --grep 'native AAC' --output=.cache/native-aac-results --reporter=list
 ```
-
-このチェックはAACエンコーダーがなければ **失敗** します。自動スキップや別コーデックへの置換はしません。
-初期検証に使用したLinux版Chromium 151ではAACデコードは利用できますが、AACエンコードは非対応でした。
-AACエンコードの対応環境、または将来採用する明示的な代替実装で、別途検証する必要があります。
-
-## 結果とデバッグ
 
 ```sh
-npm run test:report
-npm run test:web:ui
-npm run fixtures
+npm run test:report    # HTMLレポート
+npm run test:web:ui    # Playwright UI
+npm run fixtures      # テスト素材のみ生成
 ```
 
-- `playwright-report/`: HTMLレポート。
-- `test-results/results.json`: 実行結果、ブラウザ情報、検査結果。
-- `test-results/`: 出力MP4、失敗時のトレース・スクリーンショット。
-- `tests/fixtures/generated/`: 今回生成した素材と正解データ。
+`test-results/` に出力動画・検査JSON・失敗時のトレース、`playwright-report/` にHTMLレポート、
+`tests/fixtures/generated/` に生成素材と正解データを保存します。これらはGitに含めません。
+Viteの起動・停止はPlaywrightが管理します。
 
-テスト起動時にViteをループバックアドレスで起動し、終了時にPlaywrightが停止します。
-生成素材・レポート・依存パッケージはGitに含めません。
+## 初版の境界
 
-## 本体への接続
+動画全体の非圧縮展開は行いません。区間読み取り・フレーム解放・出力の処理待ち制御を使います。
+全音源の `decodeAudio` とBlob出力は、それぞれ音声全体・完成ファイル分のメモリを使います。
+長尺には `audioBlocks` とストリーム出力を利用してください。
 
-`tests/web/harness/main.ts` がテスト専用アダプターです。
-将来の本体実装に `capabilities`、`inspect`、`decodeAudio`、`roundTrip` の呼び出しを接続します。
-これは公開APIの仕様確定ではなく、テストと実装の境界です。
+初版はMP4/M4A、MP3、WAVを中心に検証しています。長時間4K、スマホ、Safari／Firefox、
+あらゆる破損ファイル、可変fps素材の網羅的な検証は今後の範囲です。
 
-Mediabunnyは現時点では開発依存のみ（MPL-2.0）で、本体での採用は未決定です。
-FFmpeg側の正解データ・検査器を独立させ、ブラウザ側と同じ誤りで成功しないようにしています。
-
-複数動画の合成、長尺でのメモリ上限、キャンセル、直接ファイル保存、可変フレームレート、
-スマホ・Safari・Firefoxの検証は、本体実装とともに追加する段階です。
+本体コードはMITライセンスです。依存ライブラリは独自のライセンスを持ちます。
+[第三者ライセンスと依存関係](THIRD_PARTY_NOTICES.md)を参照してください。
