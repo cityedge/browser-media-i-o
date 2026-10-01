@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WAV / MP3 出力サンプル</title>
+<style>
+  :root { color-scheme: light; font: 16px/1.7 system-ui, sans-serif; color: #233044; background: #f4f6fa; }
+  body { max-width: 680px; margin: 5vh auto; padding: 24px; }
+  main { background: white; padding: 32px; border: 1px solid #dce2eb; border-radius: 16px; }
+  h1 { font-size: 1.65rem; margin: 0 0 16px; } p { margin: 12px 0; }
+  label { display: block; margin: 20px 0; } select, button { font: inherit; padding: 7px 14px; }
+  input { max-width: 100%; } button { cursor: pointer; } #save { color: white; background: #2454bb; border: 1px solid #2454bb; border-radius: 6px; }
+  button:disabled { opacity: .5; cursor: default; } progress { width: 100%; }
+  #status { min-height: 3.4em; overflow-wrap: anywhere; } a { color: #2454bb; }
+</style>
+<main>
+  <h1>WAV / MP3 出力サンプル</h1>
+  <p>完成済みのWAVに、MP3で保存する選択肢を追加する例です。ファイルは端末内だけで処理します。</p>
+  <label>変換するWAV <input id="file" type="file" accept=".wav,audio/wav"></label>
+  <p>ファイル未選択の場合は、3秒のサンプル音を使います。</p>
+  <label>出力形式
+    <select id="format"><option value="mp3">MP3</option><option value="wav">WAV</option></select>
+  </label>
+  <button id="save">ファイルを作成</button>
+  <button id="cancel" disabled>中止</button>
+  <p><progress id="progress" max="1" value="0"></progress></p>
+  <p id="status" role="status" aria-live="polite">形式を選んで「ファイルを作成」を押してください。</p>
+  <a id="download" hidden>保存する</a>
+</main>
+<script src="./browser-mp3.js"></script>
+<script>
+  const fileInput = document.querySelector('#file'), formatInput = document.querySelector('#format');
+  const save = document.querySelector('#save'), cancel = document.querySelector('#cancel');
+  const status = document.querySelector('#status'), progress = document.querySelector('#progress');
+  const download = document.querySelector('#download');
+  let active, outputUrl;
+  function clearOutput() {
+    if (outputUrl) URL.revokeObjectURL(outputUrl);
+    outputUrl = undefined; download.hidden = true; download.removeAttribute('href'); progress.value = 0;
+  }
+  function changed() { clearOutput(); status.textContent = '設定を変更しました。ファイルを作成してください。'; }
+  fileInput.addEventListener('change', changed); formatInput.addEventListener('change', changed);
+  // Represents an existing app's WAV output. This example makes a short mono tone.
+  function makeWav() {
+    const sampleRate = 48000, count = sampleRate * 3, bytes = new ArrayBuffer(44 + count * 2), view = new DataView(bytes);
+    const text = (at, value) => [...value].forEach((c, i) => view.setUint8(at + i, c.charCodeAt(0)));
+    text(0, 'RIFF'); view.setUint32(4, bytes.byteLength - 8, true); text(8, 'WAVE'); text(12, 'fmt ');
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true); view.setUint16(34, 16, true); text(36, 'data'); view.setUint32(40, count * 2, true);
+    for (let i = 0; i < count; i++) {
+      const time = i / sampleRate, envelope = Math.min(1, time / .02, (3 - time) / .02);
+      view.setInt16(44 + i * 2, Math.round(Math.sin(2 * Math.PI * 440 * time) * .4 * envelope * 32767), true);
+    }
+    return new Blob([bytes], { type: 'audio/wav' });
+  }
+  cancel.onclick = () => { active?.abort(); cancel.disabled = true; };
+  save.onclick = async () => {
+    clearOutput();
+    const controller = new AbortController(); active = controller;
+    fileInput.disabled = formatInput.disabled = save.disabled = true; cancel.disabled = false;
+    try {
+      const wav = fileInput.files[0] || makeWav(), format = formatInput.value;
+      status.textContent = 'ファイルを作成中…';
+      // The integration point: keep the existing WAV branch, add this MP3 conversion.
+      const blob = format === 'mp3'
+        ? await BrowserMp3.wavToMp3(wav, { signal: controller.signal, onProgress: fraction => { progress.value = fraction; } })
+        : wav;
+      const name = fileInput.files[0]?.name.replace(/\.wav$/i, '') || 'sample';
+      outputUrl = URL.createObjectURL(blob); download.href = outputUrl;
+      download.download = `${name}.${format}`; download.textContent = `${name}.${format} を保存`;
+      download.hidden = false; progress.value = 1;
+      status.textContent = `完成しました（${Math.round(blob.size / 1024)} KB）。下のリンクから保存できます。`;
+    } catch (error) {
+      status.textContent = error.code === 'ABORTED' ? '中止しました。もう一度作成できます。' : `作成できませんでした: ${error.message}`;
+    } finally {
+      active = undefined; fileInput.disabled = formatInput.disabled = save.disabled = false; cancel.disabled = true;
+    }
+  };
+  window.addEventListener('pagehide', () => { active?.abort(); clearOutput(); });
+</script>
+</html>

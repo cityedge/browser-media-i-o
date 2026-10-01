@@ -3,18 +3,40 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Browser media probing, decoding and frame-based MP4 rendering",
+  "description": "Browser media probing, decoding, MP4 rendering and standalone MP3 export",
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./aac": { "types": "./dist/aac.d.ts", "import": "./dist/aac.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./aac": {
+      "types": "./dist/aac.d.ts",
+      "import": "./dist/aac.js"
+    },
+    "./mp3": {
+      "types": "./dist/mp3.d.ts",
+      "import": "./dist/mp3.js"
+    }
   },
-  "files": ["dist", "src", "docs", "examples", "README.md", "LICENSE.md", "THIRD_PARTY_NOTICES.md"],
+  "files": [
+    "dist",
+    "src",
+    "docs",
+    "examples",
+    "README.md",
+    "LICENSE.md",
+    "THIRD_PARTY_NOTICES.md",
+    "third_party",
+    "scripts/build-mp3.mjs",
+    "tsconfig.json",
+    "tsconfig.build.json"
+  ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node scripts/build-mp3.mjs",
     "typecheck": "tsc --noEmit",
     "fixtures": "node scripts/generate-fixtures.mjs",
     "test": "npm run build && npm run typecheck && npm run test:web && npm run test:app",
@@ -26,16 +48,20 @@
     "app:dev": "npm run build && vite --config apps/studio/vite.config.ts",
     "app:build": "npm run build && vite build --config apps/studio/vite.config.ts",
     "app:preview": "vite preview --config apps/studio/vite.config.ts",
-    "test:app": "npm run app:build && playwright test --config playwright.app.config.ts"
+    "test:app": "npm run app:build && playwright test --config playwright.app.config.ts",
+    "test:mp3": "npm run build && playwright test tests/web/mp3.spec.ts",
+    "package:mp3": "npm run build && node scripts/package-mp3.mjs"
   },
   "engines": {
     "node": ">=22.12.0"
   },
   "devDependencies": {
+    "@breezystack/lamejs": "1.2.7",
     "@mediabunny/aac-encoder": "1.61.0",
     "@playwright/test": "1.63.0",
     "@types/dom-webcodecs": "0.1.19",
     "@types/node": "^22.0.0",
+    "esbuild": "0.28.2",
     "typescript": "5.9.3",
     "vite": "8.3.1"
   },
@@ -46,6 +72,8 @@
     "@mediabunny/aac-encoder": "1.61.0"
   },
   "peerDependenciesMeta": {
-    "@mediabunny/aac-encoder": { "optional": true }
+    "@mediabunny/aac-encoder": {
+      "optional": true
+    }
   }
 }

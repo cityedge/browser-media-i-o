@@ -1,11 +1,11 @@
 # Browser Media I/O — 0.1.0
 
-Webアプリに、メディアの **入力・情報取得・MP4出力** を追加するTypeScriptライブラリです。
+Webアプリに、メディアの **入力・情報取得・MP4/MP3出力** を追加するTypeScriptライブラリです。
 ブラウザ内で処理し、画面録画やサーバー側の動画変換を必要としません。
 字幕描画、スペアナ、動画編集、合成などは利用アプリで実装できます。
 
-独自の公開APIと制御処理を、既存のMediabunnyの
-コンテナ解析・格納／コーデック機能の上に実装しています。
+MP4関連の公開APIと制御処理は、Mediabunnyのコンテナ解析・格納／コーデック機能の上に実装しています。
+MP3出力は独立したモジュールで、同梱のLAME系エンコーダーを使用します。
 
 ## できること
 
@@ -17,6 +17,7 @@ Webアプリに、メディアの **入力・情報取得・MP4出力** を追�
 | `renderMp4(options)` | 各時刻のCanvas描画と音声から、固定fpsのMP4を生成 |
 | `createMp4Writer(options)` | アプリが用意したフレームとPCMを順に渡してMP4を生成 |
 | `getCapabilities(options)` | 指定条件でのブラウザのエンコード対応を確認 |
+| `wavToMp3(wav)` / `encodeMp3(audioBuffer)` | 独立した `/mp3` モジュールで、完成済み音声をMP3に変換 |
 
 長さの情報源はメタデータ・パケット走査・デコード結果を区別します。
 既定のprobeはパケットを走査します。音源の実際の長さは `decodeAudio` が返す
@@ -27,6 +28,19 @@ Webアプリに、メディアの **入力・情報取得・MP4出力** を追�
 音声なし出力、進捗、キャンセル、Blobの容量制限、直接ファイル保存用ストリームも利用できます。
 
 詳細: [APIと動作契約](docs/API.md) ／ [音源＋Canvasの例](examples/canvas-with-audio.ts) ／ [動画入出力の例](examples/video-roundtrip.ts)
+
+## WAV出力にMP3の選択肢を追加する
+
+既存アプリのWAV保存直前に、変換を一つ追加できます。MP4機能の導入は不要です。
+
+```ts
+import { wavToMp3 } from 'browser-media-io/mp3';
+const blob = format === 'mp3' ? await wavToMp3(wavBlob) : wavBlob;
+```
+
+AudioBufferから直接出力する `encodeMp3(audioBuffer)` もあります。
+通常のHTMLへscriptタグで追加できる、エンコーダー同梱の約177 KBの単独JSも用意しています。
+[配布ZIP・WAV/MP3切り替えサンプル](downloads/browser-mp3/README.md) ／ [APIと対応範囲](docs/MP3.md)
 
 ## 実際に使って評価する
 
@@ -112,8 +126,8 @@ npm test
 FFmpeg／ffprobeのパスは `FFMPEG_PATH`／`FFPROBE_PATH` で指定できます。
 LinuxでブラウザのOS依存が不足する場合は `npx playwright install --with-deps chromium` を実行してください。
 
-**テストはビルド済みライブラリの公開APIを使用します。** `npm test` はライブラリ16件と
-本番ビルドしたアプリの操作テスト6件を実行します。ライブラリでは以下を検証します。
+**テストはビルド済みライブラリの公開APIを使用します。** `npm test` はメディア入出力16件、
+MP3出力17件、本番ビルドしたアプリの操作テスト6件を実行します。メディア入出力では以下を検証します。
 
 - 10秒・30fps・300フレームのH.264/AAC素材を毎回生成し、元の生成条件と照合。
 - 全フレームの番号・順序・タイムスタンプと、左右音声の異なる時刻に入れた音を検査。
@@ -142,6 +156,8 @@ TEST_NATIVE_AAC=1 npx playwright test --grep 'native AAC' --output=.cache/native
 npm run test:report    # HTMLレポート
 npm run test:web:ui    # Playwright UI
 npm run fixtures      # テスト素材のみ生成
+npm run test:mp3      # MP3出力・WAV/MP3サンプルだけ検証
+npm run package:mp3   # 単独JSの配布ZIPを生成（開発時のみzipコマンドが必要）
 ```
 
 `test-results/` に出力動画・検査JSON・失敗時のトレース、`playwright-report/` にHTMLレポート、

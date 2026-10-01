@@ -20,6 +20,19 @@ The original Browser Media I/O sources are licensed under the repository's MIT l
 - Uses a WebAssembly build of FFmpeg's AAC encoder (libavcodec). Refer also to the upstream FFmpeg licensing and source at https://ffmpeg.org/legal.html.
 - External, unmodified, optional dependency; not bundled into the core entry point.
 
+## MP3 export: @breezystack/lamejs 1.2.7
+
+- Authors: Alex Zhukov, the LAME project and fork contributors.
+- Package license: LGPL-3.0. This is separate from our MIT wrapper license.
+- Package: https://www.npmjs.com/package/@breezystack/lamejs/v/1.2.7
+- Exact upstream source: https://github.com/shijinyu/lamejs/tree/1fb0ef5fa177413107e2e107d054a9b994e3f79c
+- LAME MP3 Encoder: https://lame.sourceforge.io/
+- Unmodified encoder bundled into the dedicated MP3 worker. Neither the core MP4 entry point nor AAC loads it.
+- `third_party/lamejs/source.tar.gz` contains the corresponding upstream source and build files.
+  `third_party/lamejs/COPYING` and `COPYING.LESSER` contain GPLv3 and LGPLv3.
+- The standalone ZIP includes the licenses, dependency source and our wrapper/build source. See its
+  `source/BUILD.md` for rebuilding/replacing the encoder. Preserve these materials when redistributing it.
+
 These dependencies retain their own licenses. Redistributing an application with them requires preserving
 their notices and meeting the applicable source availability requirements. The repository's MIT license
 does not replace their licenses.
