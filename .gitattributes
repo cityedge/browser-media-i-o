@@ -1,0 +1,3 @@
+# Generated integration artifacts must keep exact bytes, including patches with binary payloads.
+integrations/**/*.zip binary
+integrations/**/*.patch -text -whitespace linguist-generated

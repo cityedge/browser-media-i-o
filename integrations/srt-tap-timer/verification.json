@@ -1,0 +1,112 @@
+{
+  "sourceRepository": "https://github.com/cityedge/srt-tap-timer",
+  "baseCommit": "87a11c8a8d6312a06596dc7172a337662dc1f525",
+  "implementationCommit": "bf7c7e4035b70c4f5e4e448fbfdcfd5edc766510",
+  "stats": {
+    "startTime": "2026-10-01T09:54:59.598Z",
+    "duration": 24954.243,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "name": "HTTP landscape renders 300 captioned frames with AAC despite a false MP3 header",
+      "ok": true
+    },
+    {
+      "name": "offline portrait renders 300 captioned frames with AAC despite a false MP3 header",
+      "ok": true
+    },
+    {
+      "name": "cancel during export unlocks settings and a retry creates a valid MP4",
+      "ok": true
+    },
+    {
+      "name": "invalid audio reports an error and allows replacing the material",
+      "ok": true
+    },
+    {
+      "name": "SRT and project saves keep subtitle timing and portrait styling settings",
+      "ok": true
+    },
+    {
+      "name": "missing codec support is explicit and does not break the SRT editor",
+      "ok": true
+    }
+  ],
+  "verifications": [
+    {
+      "browser": "151.0.7922.173",
+      "inputHeader": 5.016,
+      "videoFrames": 300,
+      "captionFrames": 53,
+      "decodedAudioSamples": 480256,
+      "pulses": [
+        [
+          1,
+          4,
+          7.99
+        ],
+        [
+          2,
+          4.99,
+          8.99
+        ]
+      ],
+      "sourcePulses": [
+        [
+          1,
+          4,
+          7.99
+        ],
+        [
+          2,
+          4.99,
+          8.99
+        ]
+      ],
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "browser": "151.0.7922.173",
+      "inputHeader": 5.016,
+      "videoFrames": 300,
+      "captionFrames": 53,
+      "decodedAudioSamples": 480256,
+      "pulses": [
+        [
+          1,
+          4,
+          7.99
+        ],
+        [
+          2,
+          4.99,
+          8.99
+        ]
+      ],
+      "sourcePulses": [
+        [
+          1,
+          4,
+          7.99
+        ],
+        [
+          2,
+          4.99,
+          8.99
+        ]
+      ],
+      "width": 720,
+      "height": 1280
+    }
+  ],
+  "limitations": [
+    "file:// navigation was blocked by Chromium policy; localhost and offline-after-load rendering were verified.",
+    "Push to cityedge/srt-tap-timer was rejected with HTTP 403; ZIP and patch are supplied through codex_work_01.",
+    "Original audio-player duration display can disagree with the decoded export duration for corrupt headers."
+  ]
+}

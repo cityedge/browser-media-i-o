@@ -43,6 +43,8 @@ npm run app:dev
 アプリの利用にFFmpegは不要です。
 [起動手順・評価結果・現在の制限](docs/FRAMECRAFT.md)をまとめています。
 
+既存アプリへの組み込み例として、[SRT Tap TimerのMP4出力検証版・適用パッチ](integrations/srt-tap-timer/README.md)もあります。
+
 ## ビルド・アプリへの組み込み
 
 Node.js 22.12以降を用意してください。このリポジトリはまだnpm公開していません。
