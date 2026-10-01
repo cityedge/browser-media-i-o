@@ -1,7 +1,6 @@
 # Third-party dependencies
 
 The original Browser Media I/O sources are licensed under the repository's MIT license.
-No source code from JIZURA is included.
 
 ## Mediabunny 1.61.0
 
