@@ -29,6 +29,9 @@ MP3出力は独立したモジュールで、同梱のLAME系エンコーダー�
 
 詳細: [APIと動作契約](docs/API.md) ／ [音源＋Canvasの例](examples/canvas-with-audio.ts) ／ [動画入出力の例](examples/video-roundtrip.ts)
 
+今後の拡張は [次期実装計画：連続読み取り・Worker対応・PCM変換](docs/IMPLEMENTATION_PLAN.md) に整理しています。
+これは実装前の計画で、現在のAPIとは区別してください。
+
 ## WAV出力にMP3の選択肢を追加する
 
 既存アプリのWAV保存直前に、変換を一つ追加できます。MP4機能の導入は不要です。
