@@ -1,4 +1,4 @@
-# Browser Media I/O — 0.1.0
+# Browser Media I/O — 0.2.0
 
 Webアプリに、メディアの **入力・情報取得・MP4/MP3出力** を追加するTypeScriptライブラリです。
 ブラウザ内で処理し、画面録画やサーバー側の動画変換を必要としません。
@@ -29,8 +29,10 @@ MP3出力は独立したモジュールで、同梱のLAME系エンコーダー�
 
 詳細: [APIと動作契約](docs/API.md) ／ [音源＋Canvasの例](examples/canvas-with-audio.ts) ／ [動画入出力の例](examples/video-roundtrip.ts)
 
-今後の拡張は [次期実装計画：連続読み取り・Worker対応・PCM変換](docs/IMPLEMENTATION_PLAN.md) に整理しています。
-これは実装前の計画で、現在のAPIとは区別してください。
+0.2では連続フレーム取得・読み取り単位のキャンセル・Worker対応PCM入出力を追加しました。
+[0.2の評価結果とWindowsでの再現手順](docs/VALIDATION_0.2.md) ／ [WebGL描画例](examples/webgl-frame.ts) ／ [Worker出力例](examples/worker-export.ts)
+
+サンプルレート変換などの後続機能は [実装計画](docs/IMPLEMENTATION_PLAN.md) に整理しています。
 
 ## WAV出力にMP3の選択肢を追加する
 
@@ -73,9 +75,10 @@ npm pack
 ```
 
 生成されたパッケージを自作アプリにインストールします。
+[ビルド済み0.2.0パッケージ](downloads/browser-media-io/README.md) も用意しています。
 
 ```sh
-npm install /path/to/browser-media-io-0.1.0.tgz
+npm install /path/to/browser-media-io-0.2.0.tgz
 # ネイティブAAC非対応環境でもAAC出力したい場合のみ
 npm install @mediabunny/aac-encoder@1.61.0
 ```
@@ -129,8 +132,8 @@ npm test
 FFmpeg／ffprobeのパスは `FFMPEG_PATH`／`FFPROBE_PATH` で指定できます。
 LinuxでブラウザのOS依存が不足する場合は `npx playwright install --with-deps chromium` を実行してください。
 
-**テストはビルド済みライブラリの公開APIを使用します。** `npm test` はメディア入出力16件、
-MP3出力17件、本番ビルドしたアプリの操作テスト6件を実行します。メディア入出力では以下を検証します。
+**入出力テストはビルド済みライブラリの公開APIを使用します。** 既存39件に加え、0.2の連続取得・PCM・Worker・WebGL・短尺ストリーム検証を実行します。
+長尺・性能試験は `npm run test:release` で別途実行します。メディア入出力では以下を検証します。
 
 - 10秒・30fps・300フレームのH.264/AAC素材を毎回生成し、元の生成条件と照合。
 - 全フレームの番号・順序・タイムスタンプと、左右音声の異なる時刻に入れた音を検査。
@@ -167,13 +170,13 @@ npm run package:mp3   # 単独JSの配布ZIPを生成（開発時のみzipコマ
 `tests/fixtures/generated/` に生成素材と正解データを保存します。これらはGitに含めません。
 Viteの起動・停止はPlaywrightが管理します。
 
-## 初版の境界
+## 対応範囲
 
 動画全体の非圧縮展開は行いません。区間読み取り・フレーム解放・出力の処理待ち制御を使います。
 全音源の `decodeAudio` とBlob出力は、それぞれ音声全体・完成ファイル分のメモリを使います。
 長尺には `audioBlocks` とストリーム出力を利用してください。
 
-初版はMP4/M4A、MP3、WAVを中心に検証しています。長時間4K、スマホ、Safari／Firefox、
+0.2はMP4/M4A、MP3、WAVを中心に検証しています。長時間4K、スマホ、Safari／Firefox、
 あらゆる破損ファイル、可変fps素材の網羅的な検証は今後の範囲です。
 
 本体コードはMITライセンスです。依存ライブラリは独自のライセンスを持ちます。

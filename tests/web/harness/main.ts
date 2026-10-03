@@ -2,6 +2,8 @@
 import { getCapabilities, openMedia, probe, decodeAudio, renderMp4, createMp4Writer, frameTime, MediaError,
   type ExportProgress, type PositionedWrite } from 'browser-media-io';
 import { enableAacFallback } from 'browser-media-io/aac';
+import { twoVideos, grayRoundtrip, croppedUpload } from './gpu';
+import { measureReads, longExport } from './performance';
 
 async function file(url: string) {
   const response = await fetch(url);
@@ -9,7 +11,7 @@ async function file(url: string) {
   return response.blob();
 }
 async function capabilities() {
-  return { adapter: 'browser-media-io@0.1.0', userAgent: navigator.userAgent,
+  return { adapter: 'browser-media-io@0.2.0', userAgent: navigator.userAgent,
     ...await getCapabilities({ width: 320, height: 180, videoBitrate: 1_000_000 }) };
 }
 function identify(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
@@ -82,7 +84,7 @@ async function roundTrip(url: string, mode: 'encode-opus' | 'encode-aac' | 'nati
   } finally { input.close(); }
 }
 
-const harness = { capabilities, inspect, decodeAudio: readAudio, roundTrip,
+const harness = { capabilities, inspect, decodeAudio: readAudio, roundTrip, twoVideos, grayRoundtrip, croppedUpload, measureReads, longExport,
   api: { getCapabilities, openMedia, probe, decodeAudio, renderMp4, createMp4Writer, frameTime, MediaError, enableAacFallback }, file,
   async synthetic(streaming: boolean) {
     const audio = await decodeAudio(await file('/reference.wav'));

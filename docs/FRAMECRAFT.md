@@ -106,7 +106,7 @@ AAC拡張が初期化中のWorkerを終了すると、その初期化Promiseが�
 npm run app:build      # apps/studio/dist/ に静的サイトを生成
 npm run app:preview    # ビルド結果を localhost:4174 で確認
 npm run test:app       # 本番ビルド + Playwrightのアプリテスト6件
-npm test              # メディア入出力16件 + MP3出力17件 + アプリ6件 + 型検査
+npm test              # 既存39件 + 0.2追加の入出力検証 + 型検査
 ```
 
 テストにはFFmpeg／ffprobeとChromiumが必要です。詳細は[README](../README.md#テスト)を参照してください。

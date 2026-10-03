@@ -1,0 +1,1094 @@
+{
+  "environment": {
+    "browser": "151.0.7922.173",
+    "platform": "linux",
+    "osRelease": "6.18.44",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "logicalCpus": 5,
+    "dateUTC": "2026-10-03T01:26:03.180Z"
+  },
+  "result": {
+    "bytes": 5953672,
+    "videoFrames": 54000,
+    "audioSamples": 86400000,
+    "duration": 1800,
+    "width": 320,
+    "height": 180,
+    "fps": 30,
+    "videoCodec": "h264",
+    "audioCodec": "aac",
+    "backend": "wasm",
+    "memory": [
+      {
+        "frame": 0,
+        "usedJSHeapBytes": 20722739,
+        "writes": 0,
+        "elapsedMs": 0.10000002384185791
+      },
+      {
+        "frame": 1800,
+        "usedJSHeapBytes": 24886443,
+        "writes": 0,
+        "elapsedMs": 1443.5
+      },
+      {
+        "frame": 3600,
+        "usedJSHeapBytes": 27129347,
+        "writes": 0,
+        "elapsedMs": 2666.100000023842
+      },
+      {
+        "frame": 5400,
+        "usedJSHeapBytes": 29239208,
+        "writes": 0,
+        "elapsedMs": 3914.800000011921
+      },
+      {
+        "frame": 7200,
+        "usedJSHeapBytes": 32189089,
+        "writes": 0,
+        "elapsedMs": 5205.5
+      },
+      {
+        "frame": 9000,
+        "usedJSHeapBytes": 38018521,
+        "writes": 0,
+        "elapsedMs": 6481.700000017881
+      },
+      {
+        "frame": 10800,
+        "usedJSHeapBytes": 30099240,
+        "writes": 1,
+        "elapsedMs": 7751.600000023842
+      },
+      {
+        "frame": 12600,
+        "usedJSHeapBytes": 35958118,
+        "writes": 1,
+        "elapsedMs": 9019.700000017881
+      },
+      {
+        "frame": 14400,
+        "usedJSHeapBytes": 53404968,
+        "writes": 1,
+        "elapsedMs": 10438.800000011921
+      },
+      {
+        "frame": 16200,
+        "usedJSHeapBytes": 29514538,
+        "writes": 1,
+        "elapsedMs": 11582.200000017881
+      },
+      {
+        "frame": 18000,
+        "usedJSHeapBytes": 35362327,
+        "writes": 1,
+        "elapsedMs": 12868.700000017881
+      },
+      {
+        "frame": 19800,
+        "usedJSHeapBytes": 41135935,
+        "writes": 1,
+        "elapsedMs": 13921.5
+      },
+      {
+        "frame": 21600,
+        "usedJSHeapBytes": 47954419,
+        "writes": 2,
+        "elapsedMs": 15294.800000011921
+      },
+      {
+        "frame": 23400,
+        "usedJSHeapBytes": 32857591,
+        "writes": 2,
+        "elapsedMs": 16857.40000000596
+      },
+      {
+        "frame": 25200,
+        "usedJSHeapBytes": 39939452,
+        "writes": 2,
+        "elapsedMs": 17975.20000001788
+      },
+      {
+        "frame": 27000,
+        "usedJSHeapBytes": 45777762,
+        "writes": 2,
+        "elapsedMs": 19209.30000001192
+      },
+      {
+        "frame": 28800,
+        "usedJSHeapBytes": 51540120,
+        "writes": 2,
+        "elapsedMs": 20458.90000000596
+      },
+      {
+        "frame": 30600,
+        "usedJSHeapBytes": 40694912,
+        "writes": 2,
+        "elapsedMs": 21717
+      },
+      {
+        "frame": 32400,
+        "usedJSHeapBytes": 47505813,
+        "writes": 3,
+        "elapsedMs": 22891.100000023842
+      },
+      {
+        "frame": 34200,
+        "usedJSHeapBytes": 55347274,
+        "writes": 3,
+        "elapsedMs": 23961.5
+      },
+      {
+        "frame": 36000,
+        "usedJSHeapBytes": 61098873,
+        "writes": 3,
+        "elapsedMs": 25350.30000001192
+      },
+      {
+        "frame": 37800,
+        "usedJSHeapBytes": 58528415,
+        "writes": 3,
+        "elapsedMs": 26507.100000023842
+      },
+      {
+        "frame": 39600,
+        "usedJSHeapBytes": 34374712,
+        "writes": 3,
+        "elapsedMs": 27486.90000000596
+      },
+      {
+        "frame": 41400,
+        "usedJSHeapBytes": 40211395,
+        "writes": 3,
+        "elapsedMs": 28455.90000000596
+      },
+      {
+        "frame": 43200,
+        "usedJSHeapBytes": 47028543,
+        "writes": 4,
+        "elapsedMs": 29445.40000000596
+      },
+      {
+        "frame": 45000,
+        "usedJSHeapBytes": 52820271,
+        "writes": 4,
+        "elapsedMs": 30424.80000001192
+      },
+      {
+        "frame": 46800,
+        "usedJSHeapBytes": 50172837,
+        "writes": 4,
+        "elapsedMs": 31443.100000023842
+      },
+      {
+        "frame": 48600,
+        "usedJSHeapBytes": 55907681,
+        "writes": 4,
+        "elapsedMs": 32367.90000000596
+      },
+      {
+        "frame": 50400,
+        "usedJSHeapBytes": 62188953,
+        "writes": 4,
+        "elapsedMs": 33485.70000001788
+      },
+      {
+        "frame": 52200,
+        "usedJSHeapBytes": 69273495,
+        "writes": 4,
+        "elapsedMs": 34587.90000000596
+      },
+      {
+        "frame": 54000,
+        "usedJSHeapBytes": 37280688,
+        "writes": 5,
+        "elapsedMs": 36897.30000001192
+      },
+      {
+        "frame": 54000,
+        "usedJSHeapBytes": 66554392,
+        "writes": 7,
+        "elapsedMs": 37023.20000001788
+      }
+    ],
+    "pulses": [
+      [
+        1,
+        900,
+        1799
+      ],
+      [
+        2,
+        901,
+        1799.5
+      ]
+    ],
+    "writes": 7,
+    "peakWrites": 1,
+    "largestWrite": 1048576,
+    "pcmBytes": 12800,
+    "heldCanvasCount": 1,
+    "beforeFinalizeMs": 36897.70000001788,
+    "elapsedMs": 37030.40000000596
+  },
+  "resources": [
+    {
+      "position": "LONG_EXPORT 0/54000 0s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 4
+        },
+        {
+          "name": "Nodes",
+          "value": 38
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 12523656
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 15056896
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 739016,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 1800/54000 1s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 11351996
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 20594688
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 776892,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 3600/54000 3s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 16936568
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 29245440
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 793888,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 5400/54000 4s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 17325896
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 30294016
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 796856,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 7200/54000 5s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 23644580
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 43663360
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 809088,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 9000/54000 6s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 27331652
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 44449792
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 821616,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 10800/54000 8s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 20163372
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 47071232
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 834756,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 12600/54000 9s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 26015728
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 48906240
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 842920,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 14400/54000 10s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 13799284
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 75382784
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 867004,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 16200/54000 12s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 21197168
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 75784192
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 867612,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 18000/54000 13s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 26651664
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 76308480
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 853632,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 19800/54000 14s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 30275688
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 78405632
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 882916,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 21600/54000 15s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 42464620
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 79978496
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 886844,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 23400/54000 17s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 29668812
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 82018304
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 871672,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 25200/54000 18s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 28880364
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 82018304
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 900348,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 27000/54000 19s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 33435720
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 82018304
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 889572,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 28800/54000 20s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 39659916
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 83066880
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 880856,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 30600/54000 22s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 29401720
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 83329024
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 897692,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 32400/54000 23s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 36049688
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 83329024
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 877000,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 34200/54000 24s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 41917248
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 83841024
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 902276,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 36000/54000 25s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 47472652
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 84889600
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 887188,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 37800/54000 27s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 19799696
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 85069824
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 908260,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 39600/54000 27s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 25192608
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 85069824
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 883548,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 41400/54000 28s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 30625428
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 85069824
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 910928,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 43200/54000 29s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 34256776
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 86118400
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 893104,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 45000/54000 30s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 41415356
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 87429120
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 913352,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 46800/54000 31s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 40235912
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 87691264
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 880568,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 48600/54000 32s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 43845928
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 87691264
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 907024,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 50400/54000 33s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 28986300
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 88150016
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 891816,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 52200/54000 35s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 34276736
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 89505792
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 880832,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 54000/54000 37s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 22
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 24441484
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 89255936
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 858460,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    },
+    {
+      "position": "LONG_EXPORT 54000/54000 37s",
+      "metrics": [
+        {
+          "name": "Documents",
+          "value": 1
+        },
+        {
+          "name": "Nodes",
+          "value": 23
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 50900960
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 92725248
+        }
+      ],
+      "rss": {
+        "processCount": 9,
+        "sumRssKiB": 867764,
+        "warning": "Sum of process RSS includes shared pages more than once; not unique physical memory or a GPU allocation measurement."
+      }
+    }
+  ],
+  "verified": {
+    "videoFrames": 54000,
+    "duration": 1800,
+    "decodedSamples": 86400000,
+    "ids": [
+      0,
+      27000,
+      53999
+    ],
+    "pulses": [
+      [
+        1,
+        900,
+        1799
+      ],
+      [
+        2,
+        901,
+        1799.5
+      ]
+    ],
+    "audioCodec": "aac",
+    "videoCodec": "h264",
+    "bytes": 5953672
+  }
+}

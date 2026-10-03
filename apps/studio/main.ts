@@ -122,7 +122,7 @@ function refreshDiagnostics() {
   const pcm = audio();
   const report = {
     app: 'Framecraft 0.1.0',
-    library: 'browser-media-io 0.1.0',
+    library: 'browser-media-io 0.2.0',
     browser: navigator.userAgent,
     capabilities,
     configuration: { size: size.value, fps: Number(fps.value), duration: Number(duration.value) },

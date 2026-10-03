@@ -3,6 +3,7 @@ import { once } from 'node:events';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
+import { generateStreamFixtures } from './generate-stream-fixtures.mjs';
 
 export const fixtureDir = fileURLToPath(new URL('../tests/fixtures/generated/', import.meta.url));
 export const truth = {
@@ -90,6 +91,7 @@ export async function generateFixtures() {
     ...truth, generatedAt: new Date().toISOString(),
     malformed: { file: 'wrong-duration.mp3', originalFrameCount, declaredFrameCount: Math.floor(originalFrameCount / 2) },
   }, null, 2));
+  await generateStreamFixtures(fixtureDir, ffmpeg);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

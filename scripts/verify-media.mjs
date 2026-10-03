@@ -10,7 +10,7 @@ export function probe(file) {
 }
 
 // This oracle never uses the browser adapter to inspect its output.
-export function verifyMedia(file, audioCodec, { pulseTolerance = 0.025 } = {}) {
+export function verifyMedia(file, audioCodec, { pulseTolerance = 0.025, width = truth.width, markerOffsets = [0] } = {}) {
   const info = probe(file);
   const video = info.streams.find(s => s.codec_type === 'video');
   const audio = info.streams.find(s => s.codec_type === 'audio');
@@ -18,7 +18,7 @@ export function verifyMedia(file, audioCodec, { pulseTolerance = 0.025 } = {}) {
   assert.ok(audio, 'Audio track is missing');
   assert.equal(video.codec_name, 'h264');
   assert.equal(audio.codec_name, audioCodec);
-  assert.equal(video.width, truth.width);
+  assert.equal(video.width, width);
   assert.equal(video.height, truth.height);
   assert.equal(Number(video.nb_read_frames), truth.frames, 'Decoded video frame count');
   assert.equal(Number(audio.sample_rate), truth.sampleRate);
@@ -34,18 +34,21 @@ export function verifyMedia(file, audioCodec, { pulseTolerance = 0.025 } = {}) {
   }
   assert.ok(Math.abs(Number(video.duration) - truth.duration) <= 1 / truth.fps, 'Video duration');
   const gray = ffmpeg(['-i', file, '-map', '0:v:0', '-fps_mode', 'passthrough', '-pix_fmt', 'gray', '-f', 'rawvideo', 'pipe:1']);
-  const frameBytes = truth.width * truth.height;
+  const frameBytes = width * truth.height;
   assert.equal(gray.length, frameBytes * truth.frames);
   const ids = [];
   for (let i = 0; i < truth.frames; i++) {
     let id = 0;
     const m = truth.marker;
-    for (let bit = 0; bit < m.bits; bit++) {
-      const value = gray[i * frameBytes + (m.y + 16) * truth.width + m.x + bit * m.cellWidth + 12];
-      assert.ok(value < 64 || value > 192, `Unreadable frame marker at frame ${i}, bit ${bit}`);
-      if (value > 128) id |= 1 << bit;
+    for (const offset of markerOffsets) {
+      id = 0;
+      for (let bit = 0; bit < m.bits; bit++) {
+        const value = gray[i * frameBytes + (m.y + 16) * width + offset + m.x + bit * m.cellWidth + 12];
+        assert.ok(value < 64 || value > 192, `Unreadable frame marker at frame ${i}, bit ${bit}`);
+        if (value > 128) id |= 1 << bit;
+      }
+      assert.equal(id, i, `Frame identity mismatch at output frame ${i}`);
     }
-    assert.equal(id, i, `Frame identity mismatch at output frame ${i}`);
     ids.push(id);
   }
 

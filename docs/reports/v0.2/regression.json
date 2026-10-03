@@ -1,0 +1,1487 @@
+{
+  "cases": [
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "probe keeps metadata and packet evidence distinct; audio-only inputs work",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1135,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "frame ownership, bounded handles, EOS and input cancellation",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 716,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "audioBlocks clips a requested interval exactly at PCM sample boundaries",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 751,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "Canvas plus WAV produces H.264/AAC MP4; stream=false",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1553,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "Canvas plus WAV produces H.264/AAC MP4; stream=true",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1546,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "two independent videos share the output clock at a fractional frame rate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1139,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "renderer cancellation aborts its destination and never reports completion",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 735,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "cancelling during AAC initialization settles the pending write and allows another export",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1862,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "api.spec.ts",
+      "title": "bad arguments, output limits, destination failures and frame ownership are explicit",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1247,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=false, canvas=false",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3007,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=false, canvas=true",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3364,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=true, canvas=false",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3103,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=true, canvas=true",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3422,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "gray values, aspect ratio, rotations and flips; canvas=false",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1465,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "gray values, aspect ratio, rotations and flips; canvas=true",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1706,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "gpu.spec.ts",
+      "title": "PCM validation and early finish preserve the writer contracts",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1062,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "browser codec capabilities are recorded explicitly",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1419,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "generated H.264/AAC fixture matches independent frame and audio truth",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1044,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "independent verifier rejects a duplicated frame even when frame count matches",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1500,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "browser reads MP4 metadata and seeks across keyframes in both directions",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 780,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "decoded MP3 length comes from samples despite a false Xing duration",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 810,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "MP4 round trip: re-encode all video frames, audio=encode-aac",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3011,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "media.spec.ts",
+      "title": "MP4 round trip: re-encode all video frames, audio=encode-opus",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2858,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: existing WAV becomes an offline stereo MP3 without playback or WebCodecs",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1733,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: AudioBuffer input preserves PCM and flushes a partial final frame",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1178,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: WAV format pcm_u8 including extended headers",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2019,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: WAV format pcm_s24le including extended headers",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2677,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: WAV format pcm_s32le including extended headers",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3106,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: WAV format pcm_f32le including extended headers",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3282,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: WAV format pcm_f64le including extended headers",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5065,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 8000 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 961,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 11025 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 970,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 12000 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1119,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 16000 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1101,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 22050 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1091,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 24000 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1220,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: 32000 Hz PCM uses a supported default bitrate",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1297,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: cancellation releases the worker, progress stays responsive, and retry works",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1074,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: malformed inputs, unsupported settings and size limits reject without worker leaks",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1186,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "mp3.spec.ts",
+      "title": "MP3: ordinary script demo switches WAV/MP3 and invalidates the old download",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2655,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "release.spec.ts",
+      "title": "stream output 10s finalizes with head/middle/tail sync and bounded producer storage",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2951,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "sequential B/VFR/offset/gap frames agree with independent FFprobe timing",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1662,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "half-open boundaries, actual gaps, early offsets and independent repeated frame handles",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1229,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "abort/return during initialization, pending next and paused yield joins real decoders before reuse",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1695,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "independent video/audio reads, PCM ownership, exclusive same-input reads and recovery on errors",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1244,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "PCM slices are sample exact and remain usable after input closes",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1181,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "AAC PCM readers join native decoders at initialization, next and yield cancellation points",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1205,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "web",
+      "file": "streams.spec.ts",
+      "title": "requested times are lazy and outstanding frame limits survive reader return",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1172,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "app",
+      "file": "studio.spec.ts",
+      "title": "MP4 file picker \u2192 rapid seeks \u2192 AAC export preserves all 300 frames and audio timing",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 7736,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "app",
+      "file": "studio.spec.ts",
+      "title": "image + false-duration MP3 + SRT uses decoded length and burns captions at the right times",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2632,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "app",
+      "file": "studio.spec.ts",
+      "title": "delayed MP4 audio keeps its original offset and the last video frame is held",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 5368,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "app",
+      "file": "studio.spec.ts",
+      "title": "demo can be cancelled, exported again, played and invalidated after a setting change",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 3035,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "app",
+      "file": "studio.spec.ts",
+      "title": "invalid files and captions recover without losing loaded media; silent output is supported",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 2131,
+          "retry": 0
+        }
+      ]
+    },
+    {
+      "group": "app",
+      "file": "studio.spec.ts",
+      "title": "studio fits a narrow screen and the demo makes a useful initial preview",
+      "status": "expected",
+      "runs": [
+        {
+          "status": "passed",
+          "durationMs": 1702,
+          "retry": 0
+        }
+      ]
+    }
+  ],
+  "attachments": [
+    {
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=false, canvas=false",
+      "name": "gpu-result.json",
+      "data": {
+        "result": {
+          "bytes": 82380,
+          "videoFrames": 300,
+          "audioSamples": 480000,
+          "duration": 10,
+          "width": 640,
+          "height": 180,
+          "fps": 30,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "backend": "wasm",
+          "elapsedMs": 1395.0999999940395,
+          "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "audioBufferAvailable": true,
+        "verified": {
+          "videoFrames": 300,
+          "firstFrameId": 0,
+          "lastFrameId": 299,
+          "maxVideoTimingError": 3.333333342681044e-07,
+          "decodedAudioSamples": 480256,
+          "pulseStarts": [
+            [
+              1,
+              4,
+              8
+            ],
+            [
+              2,
+              5,
+              9
+            ]
+          ],
+          "audioCodec": "aac"
+        }
+      }
+    },
+    {
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=false, canvas=true",
+      "name": "gpu-result.json",
+      "data": {
+        "result": {
+          "bytes": 82380,
+          "videoFrames": 300,
+          "audioSamples": 480000,
+          "duration": 10,
+          "width": 640,
+          "height": 180,
+          "fps": 30,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "backend": "wasm",
+          "elapsedMs": 1498.199999988079,
+          "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "audioBufferAvailable": true,
+        "verified": {
+          "videoFrames": 300,
+          "firstFrameId": 0,
+          "lastFrameId": 299,
+          "maxVideoTimingError": 3.333333342681044e-07,
+          "decodedAudioSamples": 480256,
+          "pulseStarts": [
+            [
+              1,
+              4,
+              8
+            ],
+            [
+              2,
+              5,
+              9
+            ]
+          ],
+          "audioCodec": "aac"
+        }
+      }
+    },
+    {
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=true, canvas=false",
+      "name": "gpu-result.json",
+      "data": {
+        "result": {
+          "bytes": 82380,
+          "videoFrames": 300,
+          "audioSamples": 480000,
+          "duration": 10,
+          "width": 640,
+          "height": 180,
+          "fps": 30,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "backend": "wasm",
+          "elapsedMs": 1468,
+          "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "workerProbePackets": 300,
+        "audioBufferAvailable": false,
+        "verified": {
+          "videoFrames": 300,
+          "firstFrameId": 0,
+          "lastFrameId": 299,
+          "maxVideoTimingError": 3.333333342681044e-07,
+          "decodedAudioSamples": 480256,
+          "pulseStarts": [
+            [
+              1,
+              4,
+              8
+            ],
+            [
+              2,
+              5,
+              9
+            ]
+          ],
+          "audioCodec": "aac"
+        }
+      }
+    },
+    {
+      "title": "two videos -> WebGL -> MP4 with decoded PCM; worker=true, canvas=true",
+      "name": "gpu-result.json",
+      "data": {
+        "result": {
+          "bytes": 82380,
+          "videoFrames": 300,
+          "audioSamples": 480000,
+          "duration": 10,
+          "width": 640,
+          "height": 180,
+          "fps": 30,
+          "videoCodec": "h264",
+          "audioCodec": "aac",
+          "backend": "wasm",
+          "elapsedMs": 1613.1000000238419,
+          "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "workerProbePackets": 300,
+        "audioBufferAvailable": false,
+        "verified": {
+          "videoFrames": 300,
+          "firstFrameId": 0,
+          "lastFrameId": 299,
+          "maxVideoTimingError": 3.333333342681044e-07,
+          "decodedAudioSamples": 480256,
+          "pulseStarts": [
+            [
+              1,
+              4,
+              8
+            ],
+            [
+              2,
+              5,
+              9
+            ]
+          ],
+          "audioCodec": "aac"
+        }
+      }
+    },
+    {
+      "title": "gray values, aspect ratio, rotations and flips; canvas=false",
+      "name": "gray-values.json",
+      "data": [
+        {
+          "rotation": 0,
+          "flip": false,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            31,
+            95,
+            159,
+            223
+          ],
+          "cornersGl": [
+            31,
+            95,
+            159,
+            223
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 0,
+          "flip": true,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            95,
+            31,
+            223,
+            159
+          ],
+          "cornersGl": [
+            95,
+            31,
+            223,
+            159
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 90,
+          "flip": false,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            159,
+            31,
+            223,
+            95
+          ],
+          "cornersGl": [
+            159,
+            31,
+            223,
+            95
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 90,
+          "flip": true,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            31,
+            159,
+            95,
+            223
+          ],
+          "cornersGl": [
+            31,
+            159,
+            95,
+            223
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 180,
+          "flip": false,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            223,
+            159,
+            95,
+            31
+          ],
+          "cornersGl": [
+            223,
+            159,
+            95,
+            31
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 180,
+          "flip": true,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            159,
+            223,
+            31,
+            95
+          ],
+          "cornersGl": [
+            159,
+            223,
+            31,
+            95
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 270,
+          "flip": false,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            95,
+            223,
+            31,
+            159
+          ],
+          "cornersGl": [
+            95,
+            223,
+            31,
+            159
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 270,
+          "flip": true,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            223,
+            95,
+            159,
+            31
+          ],
+          "cornersGl": [
+            223,
+            95,
+            159,
+            31
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        }
+      ]
+    },
+    {
+      "title": "gray values, aspect ratio, rotations and flips; canvas=true",
+      "name": "gray-values.json",
+      "data": [
+        {
+          "rotation": 0,
+          "flip": false,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            31,
+            95,
+            159,
+            223
+          ],
+          "cornersGl": [
+            31,
+            95,
+            159,
+            223
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 0,
+          "flip": true,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            95,
+            31,
+            223,
+            159
+          ],
+          "cornersGl": [
+            95,
+            31,
+            223,
+            159
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 90,
+          "flip": false,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            159,
+            31,
+            223,
+            95
+          ],
+          "cornersGl": [
+            159,
+            31,
+            223,
+            95
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 90,
+          "flip": true,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            31,
+            159,
+            95,
+            223
+          ],
+          "cornersGl": [
+            31,
+            159,
+            95,
+            223
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 180,
+          "flip": false,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            223,
+            159,
+            95,
+            31
+          ],
+          "cornersGl": [
+            223,
+            159,
+            95,
+            31
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 180,
+          "flip": true,
+          "width": 192,
+          "height": 96,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            159,
+            223,
+            31,
+            95
+          ],
+          "cornersGl": [
+            159,
+            223,
+            31,
+            95
+          ],
+          "maxDifference": 4,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 270,
+          "flip": false,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            95,
+            223,
+            31,
+            159
+          ],
+          "cornersGl": [
+            95,
+            223,
+            31,
+            159
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        {
+          "rotation": 270,
+          "flip": true,
+          "width": 96,
+          "height": 192,
+          "squarePixelWidth": 192,
+          "squarePixelHeight": 96,
+          "corners2d": [
+            223,
+            95,
+            159,
+            31
+          ],
+          "cornersGl": [
+            223,
+            95,
+            159,
+            31
+          ],
+          "maxDifference": 0,
+          "before": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "after": [
+            0,
+            64,
+            128,
+            192,
+            255
+          ],
+          "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        }
+      ]
+    },
+    {
+      "title": "browser codec capabilities are recorded explicitly",
+      "name": "capabilities.json",
+      "data": {
+        "adapter": "browser-media-io@0.2.0",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+        "secureContext": true,
+        "h264Encode": true,
+        "aacEncode": false,
+        "nativeAacEncode": false,
+        "opusEncode": true,
+        "browserVersion": "151.0.7922.173"
+      }
+    }
+  ],
+  "followUp": {
+    "reason": "Example setup cleanup and Worker probe/cancel assertions added after full suite",
+    "stats": {
+      "startTime": "2026-10-03T01:30:53.371Z",
+      "duration": 19791.768,
+      "expected": 7,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  }
+}

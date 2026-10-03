@@ -1,6 +1,6 @@
 {
   "name": "browser-media-io",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Browser media probing, decoding, MP4 rendering and standalone MP3 export",
@@ -50,7 +50,8 @@
     "app:preview": "vite preview --config apps/studio/vite.config.ts",
     "test:app": "npm run app:build && playwright test --config playwright.app.config.ts",
     "test:mp3": "npm run build && playwright test tests/web/mp3.spec.ts",
-    "package:mp3": "npm run build && node scripts/package-mp3.mjs"
+    "package:mp3": "npm run build && node scripts/package-mp3.mjs",
+    "test:release": "npm run build && node scripts/test-release.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

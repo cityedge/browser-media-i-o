@@ -3,6 +3,7 @@ import { getCapabilities } from './capabilities.js';
 import { abortable, checkAbort, fail, mediaError, MediaError, positive } from './errors.js';
 import { frameRateValue, frameTime, frameTiming, type FrameRate } from './time.js';
 import { aacPrimingSamples } from './aac-state.js';
+import { validatePcm, type PcmAudio } from './pcm.js';
 
 export interface PositionedWrite { type: 'write'; data: Uint8Array<ArrayBuffer>; position: number }
 export type Mp4Target = { kind: 'blob'; maxBytes?: number } | { kind: 'stream'; stream: WritableStream<PositionedWrite> };
@@ -172,27 +173,42 @@ export class Mp4Writer {
       } finally { sample.close(); }
     });
   }
-  /** Append PCM contiguously from zero, with time derived from the integer sample count. */
+  /** Window adapter. Input is borrowed until this Promise settles. */
   async addAudio(buffer: AudioBuffer): Promise<void> {
     return this.#run(async () => {
-      const config = this.#snapshot.audio;
-      if (!config || !this.#audio) fail('INVALID_ARGUMENT', 'This writer has no audio track.');
-      if (!(buffer instanceof AudioBuffer) || buffer.sampleRate !== config.sampleRate || buffer.numberOfChannels !== config.channels) {
-        fail('INVALID_ARGUMENT', 'AudioBuffer sample rate and channel count must match the output audio configuration.');
+      if (typeof AudioBuffer === 'undefined' || !(buffer instanceof AudioBuffer)) {
+        fail('INVALID_ARGUMENT', 'Expected AudioBuffer; use addPcm() in Workers.');
       }
-      // Keep temporary copies bounded even when a caller supplies a full soundtrack.
-      for (let offset = 0; offset < buffer.length; offset += 4096) {
-        this.#check();
-        const length = Math.min(4096, buffer.length - offset);
-        const pcm = new Float32Array(length * config.channels);
-        for (let c = 0; c < config.channels; c++) pcm.set(buffer.getChannelData(c).subarray(offset, offset + length), c * length);
-        const sample = new AudioSample({ data: pcm, format: 'f32-planar', sampleRate: config.sampleRate,
-          numberOfChannels: config.channels, timestamp: (this.#audioSamples - this.#audioPriming) / config.sampleRate });
-        try { await this.#backend(this.#audio.add(sample)); this.#check(); this.#audioSamples += length; }
-        finally { sample.close(); }
-      }
-      this.#progress('encoding');
+      await this.#appendPcm({ sampleRate: buffer.sampleRate, numberOfChannels: buffer.numberOfChannels,
+        length: buffer.length, channelData: Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c)) });
     });
+  }
+  /** Append planar PCM contiguously. Timestamp placement is the application's responsibility. */
+  async addPcm(pcm: PcmAudio): Promise<void> {
+    return this.#run(() => this.#appendPcm(pcm));
+  }
+  async #appendPcm(buffer: PcmAudio) {
+    validatePcm(buffer);
+    const config = this.#snapshot.audio;
+    if (!config || !this.#audio) fail('INVALID_ARGUMENT', 'This writer has no audio track.');
+    if (buffer.sampleRate !== config.sampleRate || buffer.numberOfChannels !== config.channels) {
+      fail('INVALID_ARGUMENT', 'PCM sample rate and channel count must match the output audio configuration.');
+    }
+    for (let offset = 0; offset < buffer.length; offset += 4096) {
+      this.#check();
+      const length = Math.min(4096, buffer.length - offset);
+      const pcm = new Float32Array(length * config.channels);
+      for (let c = 0; c < config.channels; c++) {
+        const values = buffer.channelData[c].subarray(offset, offset + length);
+        if (values.some(value => !Number.isFinite(value))) fail('INVALID_ARGUMENT', 'PCM samples must be finite.');
+        pcm.set(values, c * length);
+      }
+      const sample = new AudioSample({ data: pcm, format: 'f32-planar', sampleRate: config.sampleRate,
+        numberOfChannels: config.channels, timestamp: (this.#audioSamples - this.#audioPriming) / config.sampleRate });
+      try { await this.#backend(this.#audio.add(sample)); this.#check(); this.#audioSamples += length; }
+      finally { sample.close(); }
+    }
+    this.#progress('encoding');
   }
   async finish(): Promise<Mp4Result> {
     return this.#run(async () => {
