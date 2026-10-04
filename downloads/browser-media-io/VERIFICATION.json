@@ -2,8 +2,8 @@
   "version": "0.2.0",
   "sourceBaseline": "be738d8",
   "archive": "browser-media-io-0.2.0.zip",
-  "archiveSha256": "fd3a7438db9e7bec439c75c5824794a9727d30c2cc63993db52ec130b63d4cac",
-  "archiveBytes": 7058809,
+  "archiveSha256": "28c09a721f8a11cae94bf7b345b2f8a870546f444be6326e2ed6a023c23f3024",
+  "archiveBytes": 7058804,
   "internalManifestFiles": 143,
   "unchangedJsAndTypeFiles": 30,
   "verifiedCodeAndConfigFiles": 82,
@@ -52,7 +52,8 @@
   "notes": [
     "Fresh extraction initially exposed Vite starting before fixture generation; preparation now runs before Vite.",
     "Installing the optional AAC encoder with a separate Mediabunny 1.61.1 copy prevented AAC registration; documented direct exact pin to shared 1.61.0 and verified.",
-    "Linux Chromium only; Windows remains unverified."
+    "Linux Chromium only; Windows remains unverified.",
+    "After the 54-test fresh-extraction run, only repository URLs and clone-directory instructions changed. Rechecked every internal SHA-256 and reproduced the updated ZIP byte-for-byte from the extracted source."
   ],
   "recreatedZipByteIdentical": true
 }

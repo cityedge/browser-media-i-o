@@ -1,6 +1,6 @@
 # Browser MP3 — WAV出力への追加用モジュール
 
-[配布ZIPをダウンロード](https://github.com/cityedge/codex_work_01/raw/refs/heads/main/downloads/browser-mp3/browser-mp3-0.1.0.zip)
+[配布ZIPをダウンロード](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-mp3/browser-mp3-0.1.0.zip)
 
 完成済みのWAVをMP3に変換するモジュールと、WAV/MP3を選んで保存できるサンプルです。
 JavaScript本体は約177 KB。エンコーダーを含み、サーバー変換・録音・再生・CDN接続は不要です。
@@ -58,7 +58,7 @@ MP3関連17件と既存機能22件、合計39件が成功しました（スキ�
 10秒のステレオWAVは240,768バイトのMP3になり、デコード後は10.032秒でした。
 左右の音声マーカー、WAVの各PCM形式、キャンセル後の再実行、オフライン出力も検証しています。
 配布ソースを新しいフォルダーでビルドし、同じJSが生成されることも確認しました。
-[検証記録](https://github.com/cityedge/codex_work_01/blob/main/downloads/browser-mp3/verification.json)
+[検証記録](https://github.com/cityedge/browser-media-i-o/blob/main/downloads/browser-mp3/verification.json)
 
 Firefox／Safari／モバイルおよび `file://` での直接起動は未検証です。
 CSPのあるアプリではWorkerのBlob URLを許可してください（`worker-src 'self' blob:`）。
@@ -66,5 +66,5 @@ CSPのあるアプリではWorkerのBlob URLを許可してください（`worke
 ラッパーはMIT、エンコーダー `@breezystack/lamejs` 1.2.7はLGPL-3.0です。
 再配布時は同梱ライセンス・ソース・再ビルド手順を保持してください。
 
-[API仕様](https://github.com/cityedge/codex_work_01/blob/main/docs/MP3.md) ／
-[ソースリポジトリ](https://github.com/cityedge/codex_work_01)
+[API仕様](https://github.com/cityedge/browser-media-i-o/blob/main/docs/MP3.md) ／
+[ソースリポジトリ](https://github.com/cityedge/browser-media-i-o)

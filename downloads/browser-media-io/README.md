@@ -1,6 +1,6 @@
 # Browser Media I/O 0.2.0 リリース
 
-[**リリースZIPをダウンロード**](https://github.com/cityedge/codex_work_01/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.zip) ／ [SHA-256](SHA256SUMS)
+[**リリースZIPをダウンロード**](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.zip) ／ [SHA-256](SHA256SUMS)
 
 2026-10-04（日本時間）に配布構成と文書を整備しました。ライブラリ本体は0.2.0のままです。
 [導入ガイド](../../docs/GETTING_STARTED.md) ／ [変更履歴](../../CHANGELOG.md) ／ [API](../../docs/API.md) ／ [検証結果](../../docs/VALIDATION_0.2.md)
@@ -29,7 +29,7 @@ npm install --save-exact /path/to/browser-media-io-0.2.0/packages/browser-media-
 npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
 
-[tgzだけをダウンロード](https://github.com/cityedge/codex_work_01/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.tgz) することもできます。
+[tgzだけをダウンロード](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.tgz) することもできます。
 Mediabunny 1.61.0はnpmが取得します。本体とAAC拡張で同じ基盤を共有するため、上記のとおりアプリ側にも完全固定してください。MP4側はVite等でアプリに組み込み、HTTPS／localhostで実行します。
 MP3保存だけを通常HTMLに追加する場合は `dist/standalone/browser-mp3.js` を使用してください。
 詳細は同梱の導入ガイドにあります。

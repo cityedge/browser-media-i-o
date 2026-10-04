@@ -100,7 +100,7 @@ index 0000000..9b6bf5b
 +SRT Tap Timer v1.64.2（`87a11c8`）の動画作成機能を、Browser Media I/O 0.1.0の公開APIに置き換えました。
 +ローカルの検証用ブランチは `codex/mp4-export-evaluation` です。
 +この環境から本リポジトリへのプッシュはHTTP 403で拒否されたため、
-+[接続済みリポジトリの配布ページ](https://github.com/cityedge/codex_work_01/tree/main/integrations/srt-tap-timer)に検証版ZIPと適用パッチを保存しています。
++[接続済みリポジトリの配布ページ](https://github.com/cityedge/browser-media-i-o/tree/main/integrations/srt-tap-timer)に検証版ZIPと適用パッチを保存しています。
 +
 +![MP4出力の完了画面](docs/mp4-export.png)
 +
@@ -200,7 +200,7 @@ index 4a9e7a0..2a03ce0 100644
 -# SRT Tap Timer v1.64.2
 +# SRT Tap Timer v1.64.2 — MP4 evaluation
 +
-+検証版ZIP・適用パッチ: [配布ページ](https://github.com/cityedge/codex_work_01/tree/main/integrations/srt-tap-timer)。この環境から本リポジトリへのプッシュ権限はないため、接続済みリポジトリ経由で提供しています。
++検証版ZIP・適用パッチ: [配布ページ](https://github.com/cityedge/browser-media-i-o/tree/main/integrations/srt-tap-timer)。この環境から本リポジトリへのプッシュ権限はないため、接続済みリポジトリ経由で提供しています。
  
  SRT Tap Timer is a local browser-based tool for creating and editing SRT subtitle timing while listening to audio. It is designed especially for lyric subtitles, AI-generated SRT correction, simple subtitle video creation, and resumable project work.
  
@@ -5507,7 +5507,7 @@ index 0000000..11c2d1f
 +## Browser Media I/O 0.1.0 — MIT
 +
 +- Copyright (c) 2026 cityedge.
-+- Source: https://github.com/cityedge/codex_work_01/tree/655b4feccf6fe66eebf0cda617198c7c6c7152b9
++- Source: https://github.com/cityedge/browser-media-i-o/tree/655b4feccf6fe66eebf0cda617198c7c6c7152b9
 +- License: [browser-media-io.LICENSE.txt](browser-media-io.LICENSE.txt).
 +- The unmodified source and build are included in `browser-media-io-0.1.0.tgz`.
 +- SHA-256: `67c57e1aab9e770c8ef788843c81cdcb6516332ad8171b89c8f8fc59f3a052c4`.

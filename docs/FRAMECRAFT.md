@@ -12,8 +12,8 @@ Node.js 22.12以降とデスクトップChromeまたはEdgeを使用してくだ
 アプリの利用だけならFFmpegやPlaywrightのインストールは不要です。
 
 ```sh
-git clone https://github.com/cityedge/codex_work_01.git
-cd codex_work_01
+git clone https://github.com/cityedge/browser-media-i-o.git
+cd browser-media-i-o
 npm ci
 npm run app:dev
 ```

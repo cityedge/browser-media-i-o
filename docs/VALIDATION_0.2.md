@@ -126,8 +126,8 @@ Node.js 22.12以降、FFmpeg／ffprobe 7.1以降（libx264、AAC、libmp3lame入
 テスト素材は毎回生成されるため、手作業で動画を用意する必要はありません。
 
 ```sh
-git clone https://github.com/cityedge/codex_work_01.git
-cd codex_work_01
+git clone https://github.com/cityedge/browser-media-i-o.git
+cd browser-media-i-o
 npm ci
 npx playwright install chromium
 npm test
