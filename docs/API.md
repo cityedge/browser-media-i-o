@@ -214,7 +214,9 @@ import { enableAacFallback } from 'browser-media-io/aac';
 await enableAacFallback({ sampleRate: 48000, channels: 2 });
 ```
 
-別途 `npm install @mediabunny/aac-encoder@1.61.0` が必要です。ネイティブAAC対応なら `native`、
+別途 `npm install --save-exact mediabunny@1.61.0 @mediabunny/aac-encoder@1.61.0` が必要です。
+本体と拡張が同じMediabunnyを使用するよう、利用アプリでも1.61.0へ完全固定してください。
+異なる版が別々にインストールされると、拡張の登録が本体へ反映されずUNSUPPORTEDになる場合があります。ネイティブAAC対応なら `native`、
 非対応なら拡張を動的ロードして登録し `wasm` を返します。登録はそのJS実行領域で共有されます。
 メインのエントリーポイントはこの拡張を自動ロードしません。AACから別のコーデックへの自動変更もありません。
 拡張のWASMは配布パッケージに含まれ、実行時にFFmpegサーバーや外部サービスを呼びません。

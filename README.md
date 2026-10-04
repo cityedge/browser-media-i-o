@@ -4,6 +4,12 @@ Webアプリに、メディアの **入力・情報取得・MP4/MP3出力** を�
 ブラウザ内で処理し、画面録画やサーバー側の動画変換を必要としません。
 字幕描画、スペアナ、動画編集、合成などは利用アプリで実装できます。
 
+**[0.2.0のリリースZIP](https://github.com/cityedge/codex_work_01/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.zip)** ／ [導入ガイド](docs/GETTING_STARTED.md) ／ [変更履歴](CHANGELOG.md)
+
+ZIPにはインストール用tgz、ビルド済みJS・型定義、ソース、利用例、テスト、ライセンスをまとめています。
+展開後の `packages/browser-media-io-0.2.0.tgz` を利用アプリへインストールしてください。
+[同梱構成・再ビルド手順](docs/BUILDING.md)も用意しています。
+
 MP4関連の公開APIと制御処理は、Mediabunnyのコンテナ解析・格納／コーデック機能の上に実装しています。
 MP3出力は独立したモジュールで、同梱のLAME系エンコーダーを使用します。
 
@@ -45,7 +51,7 @@ const blob = format === 'mp3' ? await wavToMp3(wavBlob) : wavBlob;
 
 AudioBufferから直接出力する `encodeMp3(audioBuffer)` もあります。
 通常のHTMLへscriptタグで追加できる、エンコーダー同梱の約177 KBの単独JSも用意しています。
-[配布ZIP・WAV/MP3切り替えサンプル](downloads/browser-mp3/README.md) ／ [APIと対応範囲](docs/MP3.md)
+[配布ZIP・WAV/MP3切り替えサンプル](https://github.com/cityedge/codex_work_01/blob/main/downloads/browser-mp3/README.md) ／ [APIと対応範囲](docs/MP3.md)
 
 ## 実際に使って評価する
 
@@ -62,7 +68,7 @@ npm run app:dev
 アプリの利用にFFmpegは不要です。
 [起動手順・評価結果・現在の制限](docs/FRAMECRAFT.md)をまとめています。
 
-既存アプリへの組み込み例として、[SRT Tap TimerのMP4出力検証版・適用パッチ](integrations/srt-tap-timer/README.md)もあります。
+既存アプリへの組み込み例として、[SRT Tap TimerのMP4出力検証版・適用パッチ](https://github.com/cityedge/codex_work_01/blob/main/integrations/srt-tap-timer/README.md)もあります。
 
 ## ビルド・アプリへの組み込み
 
@@ -75,13 +81,15 @@ npm pack
 ```
 
 生成されたパッケージを自作アプリにインストールします。
-[ビルド済み0.2.0パッケージ](downloads/browser-media-io/README.md) も用意しています。
+[ビルド済み0.2.0パッケージ](https://github.com/cityedge/codex_work_01/blob/main/downloads/browser-media-io/README.md) も用意しています。
 
 ```sh
-npm install /path/to/browser-media-io-0.2.0.tgz
+npm install --save-exact /path/to/browser-media-io-0.2.0.tgz mediabunny@1.61.0
 # ネイティブAAC非対応環境でもAAC出力したい場合のみ
-npm install @mediabunny/aac-encoder@1.61.0
+npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
+
+MediabunnyとAAC拡張は1.61.0に固定し、同じ基盤を共有させます。別版の併存を避ける理由と確認方法は [導入ガイド](docs/GETTING_STARTED.md) に記載しています。
 
 パッケージはES ModulesとTypeScriptの型定義を含みます。React等のフレームワークに依存しません。
 開発・実行対象はHTTPSまたはlocalhostのデスクトップChrome／Edgeです。
@@ -163,6 +171,7 @@ npm run test:report    # HTMLレポート
 npm run test:web:ui    # Playwright UI
 npm run fixtures      # テスト素材のみ生成
 npm run test:mp3      # MP3出力・WAV/MP3サンプルだけ検証
+npm run package:release # 0.2.0のリリースZIPとSHA-256を生成（zipコマンドが必要）
 npm run package:mp3   # 単独JSの配布ZIPを生成（開発時のみzipコマンドが必要）
 ```
 

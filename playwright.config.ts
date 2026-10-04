@@ -10,7 +10,6 @@ if (executablePath) console.log(`[media tests] Using browser: ${executablePath}`
 export default defineConfig({
   testDir: './tests/web',
   testMatch: '**/*.spec.ts',
-  globalSetup: './tests/web/global-setup.ts',
   fullyParallel: false,
   workers: 1,
   retries: 0,
@@ -34,6 +33,7 @@ export default defineConfig({
     command: 'npm run test:serve',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: false,
-    timeout: 30_000,
+    // Includes first-run media fixture preparation before Vite starts.
+    timeout: 90_000,
   },
 });

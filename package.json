@@ -32,7 +32,8 @@
     "third_party",
     "scripts/build-mp3.mjs",
     "tsconfig.json",
-    "tsconfig.build.json"
+    "tsconfig.build.json",
+    "CHANGELOG.md"
   ],
   "sideEffects": false,
   "scripts": {
@@ -44,14 +45,15 @@
     "test:web:ui": "npm run build && playwright test --ui",
     "prepack": "npm run build",
     "test:report": "playwright show-report",
-    "test:serve": "vite --config tests/web/vite.config.ts",
+    "test:serve": "node scripts/prepare-web-tests.mjs && vite --config tests/web/vite.config.ts",
     "app:dev": "npm run build && vite --config apps/studio/vite.config.ts",
     "app:build": "npm run build && vite build --config apps/studio/vite.config.ts",
     "app:preview": "vite preview --config apps/studio/vite.config.ts",
     "test:app": "npm run app:build && playwright test --config playwright.app.config.ts",
     "test:mp3": "npm run build && playwright test tests/web/mp3.spec.ts",
     "package:mp3": "npm run build && node scripts/package-mp3.mjs",
-    "test:release": "npm run build && node scripts/test-release.mjs"
+    "test:release": "npm run build && node scripts/test-release.mjs",
+    "package:release": "node scripts/package-release.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

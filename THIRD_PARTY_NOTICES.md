@@ -16,7 +16,7 @@ The original Browser Media I/O sources are licensed under the repository's MIT l
 - Author: Vanilagy and contributors.
 - Package license: MPL-2.0.
 - Package and source: https://www.npmjs.com/package/@mediabunny/aac-encoder/v/1.61.0
-- Repository and build instructions: https://github.com/Vanilagy/mediabunny/tree/main/packages/aac-encoder
+- Repository and build instructions: https://github.com/Vanilagy/mediabunny/tree/v1.61.0/packages/aac-encoder
 - Uses a WebAssembly build of FFmpeg's AAC encoder (libavcodec). Refer also to the upstream FFmpeg licensing and source at https://ffmpeg.org/legal.html.
 - External, unmodified, optional dependency; not bundled into the core entry point.
 
@@ -31,7 +31,9 @@ The original Browser Media I/O sources are licensed under the repository's MIT l
 - `third_party/lamejs/source.tar.gz` contains the corresponding upstream source and build files.
   `third_party/lamejs/COPYING` and `COPYING.LESSER` contain GPLv3 and LGPLv3.
 - The standalone ZIP includes the licenses, dependency source and our wrapper/build source. See its
-  `source/BUILD.md` for rebuilding/replacing the encoder. Preserve these materials when redistributing it.
+  `source/BUILD.md` for rebuilding/replacing the encoder. The combined Browser Media I/O release ZIP instead
+  provides `src/`, build scripts and the lockfile at its root; see `docs/BUILDING.md`.
+  Preserve these materials when redistributing it.
 
 These dependencies retain their own licenses. Redistributing an application with them requires preserving
 their notices and meeting the applicable source availability requirements. The repository's MIT license

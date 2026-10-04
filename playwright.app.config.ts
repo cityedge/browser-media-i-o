@@ -3,6 +3,7 @@ import baseline from './playwright.config';
 
 export default defineConfig({
   ...baseline,
+  globalSetup: './scripts/prepare-web-tests.mjs',
   testDir: './tests/app',
   outputDir: './test-results/app',
   reporter: [

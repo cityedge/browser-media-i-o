@@ -27,8 +27,8 @@ MP3を使うアプリだけが明示的にimportします。どちらの関数�
 
 ## 通常のHTMLへの組み込み
 
-[配布ZIPと手順](../downloads/browser-mp3/README.md)に、エンコーダーを含む
-`browser-mp3.js` と、WAV/MP3の切り替えを試せる `index.html` を用意しています。
+[0.2.0の導入ガイド](GETTING_STARTED.md)に従い、リリースZIPの `dist/standalone/` を使用できます。
+エンコーダーを含む `browser-mp3.js` と、WAV/MP3の切り替えを試せる `index.html` が入っています。
 JavaScriptファイルは約177 KB（非圧縮）。実行時のnpmインストールやCDNは不要です。
 
 ```html
