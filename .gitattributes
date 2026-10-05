@@ -1,5 +1,2 @@
-# Generated integration artifacts must keep exact bytes, including patches with binary payloads.
-integrations/**/*.zip binary
-integrations/**/*.patch -text -whitespace linguist-generated
-downloads/**/*.zip binary
+# Corresponding third-party source archives must preserve exact bytes.
 third_party/**/*.tar.gz binary

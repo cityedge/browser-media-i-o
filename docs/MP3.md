@@ -27,7 +27,7 @@ MP3を使うアプリだけが明示的にimportします。どちらの関数�
 
 ## 通常のHTMLへの組み込み
 
-[0.2.0の導入ガイド](GETTING_STARTED.md)に従い、リリースZIPの `dist/standalone/` を使用できます。
+MP3専用の `browser-mp3-0.3.0.zip`、またはビルドで生成した `dist/standalone/` を使用します。
 エンコーダーを含む `browser-mp3.js` と、WAV/MP3の切り替えを試せる `index.html` が入っています。
 JavaScriptファイルは約177 KB（非圧縮）。実行時のnpmインストールやCDNは不要です。
 
@@ -102,11 +102,11 @@ const blob = await wavToMp3(wavBlob, {
   CBRの実データに基づく再生時間になりますが、圧縮処理の遅延と末尾の余白が加わります。
   44.1/48 kHzでは合計約50 ms以内をテストで確認します。サンプル単位で元の長さと一致する仕様ではありません。
 
-現時点の実機検証はデスクトップChromiumです。Firefox／Safari／モバイルは未検証です。
+デスクトップChromiumとWindows Chrome/Edgeで検証しています。Firefox／Safari／モバイルは未検証です。
 WebCodecsやHTTPSはモジュール自体の必須条件ではありませんが、Web WorkerとBlob URLが必要です。
 CSPを設定するアプリでは `worker-src 'self' blob:` を許可してください。
-HTMLを直接開く `file://` はクラウドブラウザーの管理ポリシーにより検証できていません。
-検証済みのサンプル起動方法は配布手順のlocalhost経由です。
+同じMP3実装を含む通常script版はWindows Chrome/Edgeでfile://・オフライン出力を検証しています。
+詳細は [通常HTMLへの組み込み](LOCAL_DISTRIBUTION.md) を参照してください。
 
 ## 開発と検証
 

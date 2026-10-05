@@ -5,3 +5,9 @@ test-results/
 tests/fixtures/generated/
 dist/
 *.tgz
+build/
+output/
+tests/tmp/
+AGENTS.md
+/git initial start.bat
+/git safe directory registration.bat

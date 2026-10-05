@@ -1,214 +1,99 @@
-# Browser Media I/O — 0.2.1
+# Browser Media I/O
 
-Webアプリに、メディアの **入力・情報取得・MP4/MP3出力** を追加するTypeScriptライブラリです。
-ブラウザ内で処理し、画面録画やサーバー側の動画変換を必要としません。
-字幕描画、スペアナ、動画編集、合成などは利用アプリで実装できます。
+WebアプリにMP4・MP3・WAVの読み取り、映像フレーム／PCMの取得、MP4・MP3の出力を追加するJavaScript / TypeScriptライブラリです。
+変換はブラウザ内で行います。編集UI、描画、音声ミックス、再生同期は利用アプリが担当します。
 
-**[0.2.1の配布ZIP（Release添付用）](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.1.zip)** ／ [導入ガイド](docs/GETTING_STARTED.md) ／ [変更履歴](CHANGELOG.md)
+**[通常HTMLに組み込む](docs/LOCAL_DISTRIBUTION.md)** · [npm版の導入](docs/GETTING_STARTED.md) · [API](docs/API.md) · [変更履歴](CHANGELOG.md)
 
-ZIPにはインストール用tgz、ビルド済みJS・型定義、ソース、利用例、テスト、ライセンスをまとめています。
-展開後の `packages/browser-media-io-0.2.1.tgz` を利用アプリへインストールしてください。
-[同梱構成・再ビルド手順](docs/BUILDING.md)も用意しています。
+## ローカルサーバーなしで使う
 
-MP4関連の公開APIと制御処理は、Mediabunnyのコンテナ解析・格納／コーデック機能の上に実装しています。
-MP3出力は独立したモジュールで、同梱のLAME系エンコーダーを使用します。
+0.3.0の通常script版は、**このライブラリを使うアプリ自身のindex.htmlを直接開く**構成に対応します。
+利用アプリのフォルダーにJSを置き、通常のscriptタグで読み込みます。
 
-ローカルCodexで開発を再開する場合は [引き継ぎ書](docs/LOCAL_HANDOFF.md) を参照してください。
-次の優先課題は、ローカルのindex.htmlを直接開く配布形式です。現行版ではfile://起動をまだ保証していません。
-
-## 入力APIを選ぶ
-
-0.2.1では、Mediabunnyの公開APIだけを使う入口を追加しました。関数名・引数・返却値は既存APIと共通です。
-
-```ts
-// 内部メソッドへの接続コードを読み込まない入口
-import { openMedia, probe, createMp4Writer } from 'browser-media-io/public';
-const media = await openMedia(file);
+```html
+<script src="./lib/browser-media-io.js"></script>
+<script>
+  async function inspect(file) {
+    const input = await BrowserMediaIO.openMedia(file);
+    try { return await input.probe(); }
+    finally { input.close(); }
+  }
+</script>
 ```
 
-従来の `import { openMedia } from 'browser-media-io'` は、旧デコーダーのcloseまで待つ終了保証を維持します。
-`/public` の `await reader.return()` は、進行中nextの終了・未返却結果の破棄・排他解除まで待ちます。
-その後は次の読み取りを開始できますが、Mediabunnyの後片付けが一時的に重なる場合があります。
-本パッケージは両APIを含むため、Mediabunny 1.61.0の固定は継続します。
-[契約の比較](docs/API.md#入力apiの選択021) ／ [利用例](examples/public-input.ts) ／ [0.2.1の検証結果](docs/VALIDATION_0.2.1.md)。
+AACのWASMとMP3 Workerも同梱済みです。利用時にNode.js・ローカルサーバー・CDNは不要です。
+素材はファイル選択で得たFile/Blobを渡します。
+アプリ自身に外部ES Modulesやローカルファイルへのfetchがある場合は、その部分にもfile://対応が必要です。
 
-公開済み0.2.0の正式な配布先は [GitHub Releases](https://github.com/cityedge/browser-media-i-o/releases) です。
-今回の0.2.1 ZIPはリポジトリに用意し、0.2.0の配布物は保持しています。
-
-## できること
-
-| API | 機能 |
+| 導入方法 | 利用するもの |
 |---|---|
-| `probe(file)` | MP4/M4A・MP3・WAVのトラック、サイズ、コーデック、時間などを取得 |
-| `openMedia(file)` | 必要な時刻の映像フレーム、必要区間のPCM音声を取得 |
-| `decodeAudio(file)` | 音源を全デコードし、実サンプル数とAudioBufferを取得 |
-| `renderMp4(options)` | 各時刻のCanvas描画と音声から、固定fpsのMP4を生成 |
-| `createMp4Writer(options)` | アプリが用意したフレームとPCMを順に渡してMP4を生成 |
-| `getCapabilities(options)` | 指定条件でのブラウザのエンコード対応を確認 |
-| `wavToMp3(wav)` / `encodeMp3(audioBuffer)` | 独立した `/mp3` モジュールで、完成済み音声をMP3に変換 |
+| 通常HTML・file://起動 | `browser-media-io-browser-0.3.0.zip` のJS。ビルド時は `dist/browser/` |
+| npm / バンドラー | `browser-media-io-0.3.0.tgz`。ES Modules・型定義を含む |
+| MP3出力だけを追加 | `browser-mp3-0.3.0.zip` の `browser-mp3.js` |
+| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.3.0.zip` |
 
-長さの情報源はメタデータ・パケット走査・デコード結果を区別します。
-既定のprobeはパケットを走査します。音源の実際の長さは `decodeAudio` が返す
-`sampleCount / sampleRate` から得られます。
+[公開済み配布物はGitHub Releases](https://github.com/cityedge/browser-media-i-o/releases)にあります。
+上表は0.3.0の生成物名です。未公開の版は下記コマンドで生成してください。
+従来の[0.2.1](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.2.1)と
+[0.2.0](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.2.0)の配布物は各Releaseから取得できます。
+npmレジストリには公開していません。
 
-映像出力はH.264、音声はAACが既定です。AAC非対応のブラウザでは、明示的に有効化する
-オプションのWASM拡張を使えます。Opusは指定した場合にだけ使います。
-音声なし出力、進捗、キャンセル、Blobの容量制限、直接ファイル保存用ストリームも利用できます。
+## 主なAPI
 
-詳細: [APIと動作契約](docs/API.md) ／ [音源＋Canvasの例](examples/canvas-with-audio.ts) ／ [動画入出力の例](examples/video-roundtrip.ts)
+| API | 用途 |
+|---|---|
+| `probe(file)` | トラック、コーデック、サイズ、時刻・長さの情報 |
+| `openMedia(file)` | シーク、連続フレーム、時刻付きPCM、キャンセル |
+| `decodeAudio(file)` | 音声の全デコードと実サンプル数の取得 |
+| `renderMp4(options)` | Canvas描画と音声から固定fpsのMP4を生成 |
+| `createMp4Writer(options)` | 映像・PCMを逐次渡してMP4を生成 |
+| `enableAacFallback(options)` | 必要時に同梱／追加インストールしたAAC拡張を有効化 |
+| `wavToMp3(wav)` / `encodeMp3(audio)` | 完成済み音声をMP3に変換 |
 
-0.2では連続フレーム取得・読み取り単位のキャンセル・Worker対応PCM入出力を追加しました。
-[0.2の評価結果とWindowsでの再現手順](docs/VALIDATION_0.2.md) ／ [WebGL描画例](examples/webgl-frame.ts) ／ [Worker出力例](examples/worker-export.ts)
+通常script版の `BrowserMediaIO` は従来の終了保証を使います。
+内部デコーダーへの接続コードを読み込まない場合は、別JSの `BrowserMediaIOPublic` を選んでください。
+npm版ではそれぞれ `browser-media-io` と `browser-media-io/public` です。
+両方とも同じ入力機能を提供しますが、キャンセル後の終了保証が異なります。[API契約](docs/API.md)を参照してください。
 
-サンプルレート変換などの後続機能は [実装計画](docs/IMPLEMENTATION_PLAN.md) に整理しています。
+## ビルド
 
-## WAV出力にMP3の選択肢を追加する
-
-既存アプリのWAV保存直前に、変換を一つ追加できます。MP4機能の導入は不要です。
-
-```ts
-import { wavToMp3 } from 'browser-media-io/mp3';
-const blob = format === 'mp3' ? await wavToMp3(wavBlob) : wavBlob;
-```
-
-AudioBufferから直接出力する `encodeMp3(audioBuffer)` もあります。
-通常のHTMLへscriptタグで追加できる、エンコーダー同梱の約177 KBの単独JSも用意しています。
-[配布ZIP・WAV/MP3切り替えサンプル](https://github.com/cityedge/browser-media-i-o/blob/main/downloads/browser-mp3/README.md) ／ [APIと対応範囲](docs/MP3.md)
-
-## 実際に使って評価する
-
-このリポジトリには評価用アプリ **Framecraft** があります。
-画像／MP4＋音源＋SRTからMP4を作り、プレビュー、音声の実測時間、キャンセル、出力結果を確認できます。
-「サンプルを試す」で素材なしでも動作を試せます。
-
-```sh
-npm ci
-npm run app:dev
-```
-
-同じ端末のChrome／Edgeで **http://localhost:4174** を開いてください。
-アプリの利用にFFmpegは不要です。
-[起動手順・評価結果・現在の制限](docs/FRAMECRAFT.md)をまとめています。
-
-既存アプリへの組み込み例として、[SRT Tap TimerのMP4出力検証版・適用パッチ](https://github.com/cityedge/browser-media-i-o/blob/main/integrations/srt-tap-timer/README.md)もあります。
-
-## ビルド・アプリへの組み込み
-
-Node.js 22.12以降を用意してください。このリポジトリはまだnpm公開していません。
+開発者はNode.js 22.12以降を使います。利用アプリのエンドユーザーには不要です。
 
 ```sh
 npm ci
 npm run build
-npm pack
+npm run package:browser   # 通常script版の軽量ZIP
+npm run package:release   # npm・MP3・対応ソースを含むRelease用ファイル一式
 ```
 
-生成されたパッケージを自作アプリにインストールします。
-[ビルド済み0.2.1パッケージ](https://github.com/cityedge/browser-media-i-o/blob/main/downloads/browser-media-io/README.md) も用意しています。
+生成物は `dist/` と `output/releases/` に出力します。
+大きな依存ソースは対応ソースZIPだけに含め、組み込み用ZIPやGitの通常ツリーには含めません。
+[詳しいビルド・配布手順](docs/BUILDING.md)を参照してください。
+
+## 利用例とテスト
+
+- [通常script版の例](examples/local/)：ビルド後の `dist/browser/examples/local/index.html` を直接開けます。
+- [Canvas＋音声](examples/canvas-with-audio.ts)、[動画の再出力](examples/video-roundtrip.ts)、[公開APIの読込](examples/public-input.ts)。
+- [Worker＋PCM](examples/worker-export.ts)、[WebGL](examples/webgl-frame.ts)、[WAV保存にMP3を追加](docs/MP3.md)。
+- [Framecraft](docs/FRAMECRAFT.md)：画像・動画・音声・字幕を組み合わせるアプリ実装例。Viteで動作します。
 
 ```sh
-npm install --save-exact /path/to/browser-media-io-0.2.1.tgz mediabunny@1.61.0
-# ネイティブAAC非対応環境でもAAC出力したい場合のみ
-npm install --save-exact @mediabunny/aac-encoder@1.61.0
+npm test                 # 型検査・既存の入出力59件・アプリ6件
+npm run test:local       # 実際の軽量ZIPを展開し、file://・オフラインで検証
+npm run check:distribution # 公開ファイル・文書リンク・npm収録範囲を検査
 ```
 
-MediabunnyとAAC拡張は1.61.0に固定し、同じ基盤を共有させます。別版の併存を避ける理由と確認方法は [導入ガイド](docs/GETTING_STARTED.md) に記載しています。
-
-パッケージはES ModulesとTypeScriptの型定義を含みます。React等のフレームワークに依存しません。
-開発・実行対象はHTTPSまたはlocalhostのデスクトップChrome／Edgeです。
-
-```ts
-import { decodeAudio, renderMp4 } from 'browser-media-io';
-import { enableAacFallback } from 'browser-media-io/aac';
-
-const audio = await decodeAudio(audioFile);
-await enableAacFallback({ sampleRate: audio.sampleRate, channels: audio.channels });
-
-const result = await renderMp4({
-  width: 1280, height: 720, fps: 30, duration: audio.duration,
-  audio: audio.buffer,
-  onProgress: ({ fraction }) => console.log(fraction),
-  renderFrame(ctx, time) {
-    ctx.fillStyle = '#152333'; ctx.fillRect(0, 0, 1280, 720);
-    ctx.fillStyle = 'white'; ctx.font = '48px sans-serif';
-    ctx.fillText(`再生位置 ${time.toFixed(2)} 秒`, 80, 120);
-  },
-});
-// result.blob が完成したMP4です。
-```
-
-ネイティブAACだけを使うアプリは `/aac` のimportと有効化を省略できます。
-基本パッケージからAAC拡張を自動ロードすることはありません。
-
-## テスト
-
-FFmpeg／ffprobe（libx264、AAC、libmp3lameが必要）とChromiumを使用します。
-FFmpegは素材生成と独立検証だけに使い、ライブラリの実行時には不要です。
-
-```sh
-npm ci
-npx playwright install chromium
-npm test
-```
-
-このクラウド環境にはFFmpegとChromiumがあるため、次のコマンドで実行できます。
-
-```sh
-npm --cache /tmp/codex-npm-cache ci
-npm test
-```
-
-ブラウザは `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` の明示指定、Playwright管理ブラウザ、
-既存 `/usr/bin/chromium` の順で選択し、実際のバージョンをレポートへ保存します。
-FFmpeg／ffprobeのパスは `FFMPEG_PATH`／`FFPROBE_PATH` で指定できます。
-LinuxでブラウザのOS依存が不足する場合は `npx playwright install --with-deps chromium` を実行してください。
-
-**入出力テストはビルド済みライブラリの公開APIを使用します。** 既存39件に加え、0.2の連続取得・PCM・Worker・WebGL・短尺ストリーム検証を実行します。
-長尺・性能試験は `npm run test:release` で別途実行します。メディア入出力では以下を検証します。
-
-- 10秒・30fps・300フレームのH.264/AAC素材を毎回生成し、元の生成条件と照合。
-- 全フレームの番号・順序・タイムスタンプと、左右音声の異なる時刻に入れた音を検査。
-- 同じフレーム数でも途中のフレームを複製した出力を、検査器が拒否。
-- メタデータ取得と全パケット走査、前後シーク、フレーム解放、範囲外の取得。
-- 5.016秒と申告するMP3から、10秒・480,000サンプルの音声を取得。
-- 音声区間のサンプル精度の切り出し。
-- MP4の映像・音声を全デコードし、H.264＋AAC（WASM補完）とH.264＋Opusに再エンコード。
-- CanvasとWAVからのMP4生成、Blob保存と実ファイルストリーム保存。
-- 二つの動画を共通の時計で読み、30000/1001fpsで出力。
-- 途中キャンセル、容量超過、書き込み失敗、引数エラー、所有権。
-- AAC初期化中の中止で、未完了の書き込みが待ち続けず、再出力できること。
-
-独立検査はFFmpeg／ffprobeで実行します。映像時刻の誤差上限は2µs、出力音声マーカーは5ms（入力素材検査は25ms）、
-デコード後音声長は50msを初期基準としています。音声の遅延・パディングを含む許容値で、
-すべての入力に対するサンプル単位の完全一致を保証するものではありません。
-
-Linux版ChromiumのネイティブAACエンコードは非対応ですが、WASM拡張を使用する通常テストではAAC出力まで確認します。
-ネイティブ実装だけを要求する次の専用チェックは、非対応環境では明確に失敗します。
-
-```sh
-TEST_NATIVE_AAC=1 npx playwright test --grep 'native AAC' --output=.cache/native-aac-results --reporter=list
-```
-
-```sh
-npm run test:report    # HTMLレポート
-npm run test:web:ui    # Playwright UI
-npm run fixtures      # テスト素材のみ生成
-npm run test:mp3      # MP3出力・WAV/MP3サンプルだけ検証
-npm run package:release # 0.2.1の配布ZIP（Release添付用）とSHA-256を生成（zipコマンドが必要）
-npm run package:mp3   # 単独JSの配布ZIPを生成（開発時のみzipコマンドが必要）
-```
-
-`test-results/` に出力動画・検査JSON・失敗時のトレース、`playwright-report/` にHTMLレポート、
-`tests/fixtures/generated/` に生成素材と正解データを保存します。これらはGitに含めません。
-Viteの起動・停止はPlaywrightが管理します。
+テストにはPlaywrightとFFmpeg/ffprobeが必要です。[環境設定](docs/BUILDING.md) /
+[0.3.0の検証範囲](docs/VALIDATION_0.3.0.md) /
+[0.2.1のAPI検証](docs/VALIDATION_0.2.1.md) /
+[長尺・性能検証](docs/VALIDATION_0.2.md)。
 
 ## 対応範囲
 
-動画全体の非圧縮展開は行いません。区間読み取り・フレーム解放・出力の処理待ち制御を使います。
-全音源の `decodeAudio` とBlob出力は、それぞれ音声全体・完成ファイル分のメモリを使います。
-長尺には `audioBlocks` とストリーム出力を利用してください。
+デスクトップChrome / Edgeを中心に検証しています。Safari・Firefox・モバイルは未検証です。
+利用可能なコーデックはOS・ブラウザ・設定に依存します。
+file://で確認した保存方法はBlobダウンロードです。長尺file://出力と直接ファイルストリーム保存は未検証です。
+サンプル画面の60秒・128 MiBという上限はサンプル固有で、ライブラリ全体の固定上限ではありません。
 
-0.2はMP4/M4A、MP3、WAVを中心に検証しています。長時間4K、スマホ、Safari／Firefox、
-あらゆる破損ファイル、可変fps素材の網羅的な検証は今後の範囲です。
-
-本体コードはMITライセンスです。依存ライブラリは独自のライセンスを持ちます。
-[第三者ライセンスと依存関係](THIRD_PARTY_NOTICES.md)を参照してください。
+本体はMIT。依存はMPL-2.0やLGPLなどの別ライセンスです。
+[第三者通知](THIRD_PARTY_NOTICES.md)と[対応ソース・再ビルド方法](docs/SOURCES.md)を確認してください。

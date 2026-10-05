@@ -1,5 +1,15 @@
 # 変更履歴
 
+## 0.3.0
+
+- `BrowserMediaIO` / `BrowserMediaIOPublic` の通常script版を追加。既存npm版と両入力APIの契約は維持。
+- AAC拡張・WASM・MP3 Blob Workerを同梱し、初回から通信なしでfile://から実行可能に。
+- 利用アプリのindex.htmlから通常scriptを読み込める配布を追加。日英・ダークテーマの小さな組み込み例を添付。
+- Windowsでも生成できる `package:browser` と、実際のZIP展開後に検査する `test:local` を追加。
+- 日本語・空白パス、Chrome/Edge、ネイティブAAC/WASM、公開API単独バンドルを検証。
+- 組み込み用の軽量ZIPと対応ソースZIPを分離。ライセンス・ソース入手先・再ビルド手順を整備。
+- リポジトリはソース・API文書・利用例・検証を中心に整理。引き継ぎ資料、旧試作、別アプリ用配布物と重複ZIPを公開ツリーから除外。既存0.2.0/0.2.1はGitHub Releasesに保持。
+
 ## 0.2.1
 
 - `browser-media-io/public` を追加。Mediabunnyの公開APIだけで、同じ入力・情報取得・出力APIを利用できます。

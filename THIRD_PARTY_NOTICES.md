@@ -1,43 +1,49 @@
 # Third-party dependencies
 
-The original Browser Media I/O sources are licensed under the repository's MIT license.
+Browser Media I/O's original sources are MIT licensed. Dependencies retain their own licenses.
 
-## Mediabunny 1.61.0
+## Mediabunny 1.61.0 — MPL-2.0
 
-- Author: Vanilagy and contributors.
-- Package license: Mozilla Public License 2.0 (MPL-2.0).
-- Package and versioned source: https://www.npmjs.com/package/mediabunny/v/1.61.0
-- Repository: https://github.com/Vanilagy/mediabunny
-- Used for container parsing/writing, codec integration, and bounded media sinks/sources.
-- It is an external, unmodified npm dependency. Its source and license accompany the dependency package.
+Author: Vanilagy and contributors.
+Used for container parsing/writing, media sinks/sources, and codec integration.
+Unmodified dependency. [Package](https://www.npmjs.com/package/mediabunny/v/1.61.0) /
+[versioned source](https://github.com/Vanilagy/mediabunny/tree/v1.61.0).
 
-## Optional @mediabunny/aac-encoder 1.61.0
+## @mediabunny/aac-encoder 1.61.0 — MPL-2.0
 
-- Author: Vanilagy and contributors.
-- Package license: MPL-2.0.
-- Package and source: https://www.npmjs.com/package/@mediabunny/aac-encoder/v/1.61.0
-- Repository and build instructions: https://github.com/Vanilagy/mediabunny/tree/v1.61.0/packages/aac-encoder
-- Uses a WebAssembly build of FFmpeg's AAC encoder (libavcodec). Refer also to the upstream FFmpeg licensing and source at https://ffmpeg.org/legal.html.
-- External, unmodified, optional dependency; not bundled into the core entry point.
+Author: Vanilagy and contributors.
+Unmodified extension using a prebuilt WebAssembly build of FFmpeg's AAC encoder.
+[Package](https://www.npmjs.com/package/@mediabunny/aac-encoder/v/1.61.0) /
+[source and build instructions](https://github.com/Vanilagy/mediabunny/tree/v1.61.0/packages/aac-encoder).
+FFmpeg retains its [upstream licensing](https://ffmpeg.org/legal.html);
+its [source](https://github.com/FFmpeg/FFmpeg) and LGPLv2.1 license are separate from MPL.
 
-## MP3 export: @breezystack/lamejs 1.2.7
+The npm core does not automatically load this optional extension. The classic-script bundles explicitly
+include its inline WASM and share one bundled Mediabunny instance; call enableAacFallback before AAC output.
 
-- Authors: Alex Zhukov, the LAME project and fork contributors.
-- Package license: LGPL-3.0. This is separate from our MIT wrapper license.
-- Package: https://www.npmjs.com/package/@breezystack/lamejs/v/1.2.7
-- Exact upstream source: https://github.com/shijinyu/lamejs/tree/1fb0ef5fa177413107e2e107d054a9b994e3f79c
-- LAME MP3 Encoder: https://lame.sourceforge.io/
-- Unmodified encoder bundled into the dedicated MP3 worker. Neither the core MP4 entry point nor AAC loads it.
-- `third_party/lamejs/source.tar.gz` contains the corresponding upstream source and build files.
-  `third_party/lamejs/COPYING` and `COPYING.LESSER` contain GPLv3 and LGPLv3.
-- The standalone ZIP includes the licenses, dependency source and our wrapper/build source. See its
-  `source/BUILD.md` for rebuilding/replacing the encoder. The combined Browser Media I/O release ZIP instead
-  provides `src/`, build scripts and the lockfile at its root; see `docs/BUILDING.md`.
-  Preserve these materials when redistributing it.
+## @breezystack/lamejs 1.2.7 — LGPL-3.0
 
-These dependencies retain their own licenses. Redistributing an application with them requires preserving
-their notices and meeting the applicable source availability requirements. The repository's MIT license
-does not replace their licenses.
+Authors: Alex Zhukov, the LAME project and fork contributors.
+[Package](https://www.npmjs.com/package/@breezystack/lamejs/v/1.2.7) /
+[exact upstream source](https://github.com/shijinyu/lamejs/tree/1fb0ef5fa177413107e2e107d054a9b994e3f79c).
+Unmodified encoder bundled into the MP3 Blob worker. The npm core MP4 entry does not include it.
+The classic all-in-one bundles and the dedicated BrowserMp3 script include it.
 
-Playwright, Vite, TypeScript and the locally installed FFmpeg/ffprobe are development and test tools;
-they are not required by the browser-side core at runtime.
+third_party/lamejs/source.tar.gz contains corresponding upstream source/build files.
+COPYING and COPYING.LESSER contain GPLv3 and LGPLv3. The standalone MP3 ZIP also includes these files.
+
+## Source availability and replacement
+
+The classic-script ZIP contains the library, optional example, notices and license texts.
+The matching browser-media-io-sources-<version>.zip contains our wrapper/build sources and lockfile,
+LAME's corresponding source, and the complete Mediabunny v1.61.0 source archive including AAC build inputs.
+Publish the matching source ZIP alongside the binaries on
+[GitHub Releases](https://github.com/cityedge/browser-media-i-o/releases).
+Provenance and fixed hashes for downloaded materials are recorded in third_party/SOURCES.json.
+
+See [source and rebuilding instructions](https://github.com/cityedge/browser-media-i-o/blob/main/docs/SOURCES.md)
+(also SOURCES.md in the classic-script ZIP). Modified dependencies can be rebuilt and relinked into the
+classic scripts; no signing key is required. Preserve notices, licenses and source availability when redistributing.
+The original wrapper's MIT license does not replace dependency licenses.
+
+Playwright, Vite, TypeScript and local FFmpeg/ffprobe are development/test tools, not browser runtime prerequisites.

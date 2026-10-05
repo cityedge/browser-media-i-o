@@ -1,4 +1,8 @@
-# 導入ガイド — 0.2.1
+# 導入ガイド — 0.3.0
+
+利用アプリをローカルサーバーなしで動かす場合は、通常script版JSをアプリのHTMLから読み込みます。
+通常scriptでの導入方法と制限は [ローカルHTML配布](LOCAL_DISTRIBUTION.md) を参照してください。
+以下はnpm / ES Modules版の導入方法です。
 
 Browser Media I/Oは、Webアプリにメディアの入力・情報取得・MP4／MP3出力を加えるライブラリです。
 描画、字幕、音声ミックス、編集タイムラインはアプリ側で用意します。
@@ -7,29 +11,30 @@ Browser Media I/Oは、Webアプリにメディアの入力・情報取得・MP4
 
 | 用途 | 利用するもの | 開発時に必要なもの |
 |---|---|---|
+| ローカルサーバーなしでMP4/MP3入出力 | 通常script版のbrowser-media-io.js | 配布JSをアプリにコピー。利用時はNode.js不要 |
 | MP4の読み取り・情報取得・出力、WorkerでのPCM処理 | `browser-media-io` パッケージ | Node.js 22.12以降、npm、Vite等のバンドラー |
 | npmを使うアプリのWAV／AudioBufferからMP3出力 | パッケージの `browser-media-io/mp3` | 同上 |
 | 通常のHTMLへMP3保存だけを追加 | `dist/standalone/browser-mp3.js` | ビルド不要。JSをアプリにコピー |
 
-MP4側はHTTPSまたはlocalhostで実行し、WebCodecsの利用可否を確認してください。
-利用対象はデスクトップChrome／Edgeです。Linux Chromiumで検証済み、Windows Chrome／Edgeは未検証です。
+ES Modules版はHTTPSまたはlocalhostで実行し、WebCodecsの利用可否を確認してください。
+通常script版はWindows Chrome/Edgeのfile://でも検証しています。
 本番サーバーでFFmpegを動かす必要はありません。FFmpeg／ffprobeはこのライブラリの開発テストでだけ使います。
 
-## ZIPを展開してパッケージをインストール
+## npm用tgzをインストール
 
-配布ファイルは `browser-media-io-0.2.1.zip` です。展開すると同名のフォルダーができます。
-ZIPルートの `packages/` に、インストール用の `browser-media-io-0.2.1.tgz` が入っています。
+配布ファイルは `browser-media-io-0.3.0.tgz` です。
+GitHub Releasesから取得するか、ソースでnpm ci → npm run build → npm packを実行して生成します。
 利用先アプリの `package.json` があるディレクトリで、実際のパスを指定します。
 
 ```sh
-npm install --save-exact /path/to/browser-media-io-0.2.1/packages/browser-media-io-0.2.1.tgz mediabunny@1.61.0
+npm install --save-exact /path/to/browser-media-io-0.3.0.tgz mediabunny@1.61.0
 # ネイティブAAC非対応環境でもAAC出力する場合
 npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
 
-Windowsでは引用符で囲んだパス（例: `npm install --save-exact "C:/Downloads/browser-media-io-0.2.1/packages/browser-media-io-0.2.1.tgz" mediabunny@1.61.0`）も使えます。
+Windowsでは引用符で囲んだパス（例: `npm install --save-exact "C:/Downloads/browser-media-io-0.3.0.tgz" mediabunny@1.61.0`）も使えます。
 まだnpmレジストリへ公開していないため、パッケージ名だけの `npm install browser-media-io` は導入手順ではありません。
-Mediabunny 1.61.0は依存としてnpmが取得します。このZIPにnode_modulesは含めていません。
+Mediabunny 1.61.0は依存としてnpmが取得します。tgzにnode_modulesは含めていません。
 インストールにはnpmレジストリへの接続が必要ですが、変換処理そのものはブラウザ内で完結します。
 
 Mediabunnyはアプリ側にも1.61.0を完全固定します。AAC拡張は同じMediabunnyへ登録される必要があり、
@@ -121,7 +126,7 @@ import { wavToMp3 } from 'browser-media-io/mp3';
 const blob = format === 'mp3' ? await wavToMp3(wavBlob) : wavBlob;
 ```
 
-通常のHTMLでは、ZIP内の `dist/standalone/browser-mp3.js` をコピーして読み込みます。
+通常のHTMLでは、MP3専用ZIPの `browser-mp3.js`（ビルド時はdist/standalone/）をコピーして読み込みます。
 
 ```html
 <script src="browser-mp3.js"></script>
@@ -132,9 +137,8 @@ const blob = format === 'mp3' ? await wavToMp3(wavBlob) : wavBlob;
 </script>
 ```
 
-切り替えを試すHTMLは `dist/standalone/index.html` です。同じディレクトリのJSと一緒にHTTPサーバーで配信します。
-例えばPythonがある端末では、ZIPルートから `python -m http.server 4181 --directory dist/standalone` を実行し、
-同じ端末のブラウザで `http://localhost:4181/` を開けます。file://での直接起動は未検証です。
+切り替えを試すHTMLは `dist/standalone/index.html` です。
+通常script版のMP4/MP3統合例は `dist/browser/examples/local/index.html` を直接開いて利用できます。
 MP3にはWorkerとBlob URLが必要です。CSPを指定している場合は `worker-src 'self' blob:` を許可してください。
 [MP3 API・入力形式・ビットレート](MP3.md) ／ [第三者ライセンス](../THIRD_PARTY_NOTICES.md)。
 

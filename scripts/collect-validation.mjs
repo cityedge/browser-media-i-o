@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-const directory = process.env.MEDIA_REPORT_DIR ?? 'docs/reports/v0.2';
+const directory = process.env.MEDIA_REPORT_DIR ?? 'output/validation';
 await mkdir(directory, { recursive: true });
 const cases = [], attachments = [];
 for (const [group, file] of [['web', 'test-results/results.json'], ['app', 'test-results/app/results.json']]) {
