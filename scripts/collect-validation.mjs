@@ -11,7 +11,7 @@ for (const [group, file] of [['web', 'test-results/results.json'], ['app', 'test
         cases.push({ group, file: spec.file, title: spec.title, status: test.status,
           runs: test.results.map(r => ({ status: r.status, durationMs: r.duration, retry: r.retry })) });
         for (const result of test.results) for (const item of result.attachments ?? []) {
-          if (!['capabilities.json', 'gray-values.json', 'gpu-result.json'].includes(item.name) || !item.body) continue;
+          if (!['capabilities.json', 'gray-values.json', 'gpu-result.json', 'reader-cleanup.json', 'public-roundtrip.json'].includes(item.name) || !item.body) continue;
           const data = JSON.parse(Buffer.from(item.body, 'base64').toString());
           if (data.verified) delete data.verified.ffprobe;
           attachments.push({ title: spec.title, name: item.name, data });

@@ -1,10 +1,47 @@
-# APIと動作契約（0.2.0）
+# APIと動作契約（0.2.1）
 
 独立したMP3出力モジュール（`browser-media-io/mp3`）の仕様は [MP3.md](MP3.md) を参照してください。
 
 対象はブラウザ内の入力・情報取得・MP4出力です。編集、字幕解析、合成、スペアナ、音声ミックスは利用アプリが担当します。
 公開APIは秒単位、PCMの長さはチャンネル当たりのサンプル数です。対象はHTTPSまたはlocalhostのデスクトップChrome／Edgeです。
 コーデックの対応はブラウザとOSに依存し、指定解像度などを含め `getCapabilities()` で事前確認します。
+
+## 入力APIの選択（0.2.1）
+
+```ts
+// 既存API: デコーダーcloseまで待つ
+import { openMedia as openStrict } from 'browser-media-io';
+// 追加API: Mediabunnyの公開APIだけを使う
+import { openMedia as openPublic } from 'browser-media-io/public';
+```
+
+両方とも同じ `MediaInput` 型を返します。`probe`、`getVideoFrame`、`videoFrames`、`videoFramesAt`、
+`audioPcmBlocks`、`audioBlocks`、`close` の機能・引数・時刻境界・所有権・エラー規則は共通です。
+`/public` は情報取得・音声全デコード・MP4出力・型定義も同じ名前で公開するため、import元を一箇所変更して選択できます。
+AACとMP3の入口は引き続き `/aac` と `/mp3` です。
+
+| 契約 | 従来のopenMedia | /publicのopenMedia |
+|---|---|---|
+| Mediabunnyへの接続 | 非公開の終了管理アダプターを含む | 公開APIのみ。アダプターをimportしない |
+| return完了時の進行中next | 終了済み | 終了済み |
+| 古い結果の混入防止・入力排他の解除 | 保証 | 保証 |
+| return完了時の旧デコーダーclose | 待つ | 待たない。背景の後片付けが続く場合あり |
+| 中止前に返却済みのフレーム | 利用側所有。個別中止では閉じない | 同じ |
+| 全入力close後の再利用 | 不可 | 不可 |
+
+/publicでも、シーク時は `abort()` → `await reader.return()` → 次のreader開始という順序を守ります。
+返却待ちのnextの結果・例外は利用側で処理してください。ライブラリが管理する待機・排他の解除を完了点とし、
+基盤内部の先読み処理・デコーダーの停止完了・ブラウザのメモリ回収は完了点に含めません。
+反復シークでは旧処理と新処理が一時的に重なる可能性があり、終了までの固定時間は保証しません。
+一つのreader内の逐次取得と先読み制御は維持しますが、重なったreader全体の資源数の上限は保証しません。
+
+関数名で使い分けたい場合は、ルートから `openMediaPublic` もimportできます。
+この関数自体は公開API版ですが、ルートのモジュールグラフには従来アダプターも存在します。
+内部接続コードの読み込み自体を避けるアプリは、`browser-media-io/public` に統一してください。
+
+Mediabunnyの依存は、従来APIと共存するこのパッケージでは引き続き1.61.0に固定します。
+公開API版の追加は任意バージョンへの互換保証ではありません。依存を更新する場合の検証範囲は別途判断します。
+以下の共通API例はルートを使っています。/publicへ置き換えた場合、終了保証はこの節の契約になります。
 
 ## 情報取得
 
@@ -110,7 +147,8 @@ const frame = await media.getVideoFrame(5);
 frame?.close();
 ```
 
-returnは反復可能です。待機中nextを終了させ、未返却フレームと旧デコーダーを解放してから成功します。
+returnは反復可能です。従来のopenMediaでは、待機中nextを終了させ、未返却フレームと旧デコーダーを解放してから成功します。
+/publicでは待機中nextとラッパーの解放処理を終了させ、基盤のデコーダーcloseは待ちません。
 個別abortではnextがABORTEDになり、返却済みフレームは閉じません。returnだけでの終了時も、
 競合して進行中だったnextはdoneまたはABORTEDになり得るため、Promiseを放置しないでください。
 自然終了と `for await` のbreakも終了処理を待ちます。returnに失敗した入力は閉じられ、再利用できません。
@@ -122,7 +160,8 @@ closeは反復可能ですが入力の再利用はできません。進行中rea
 入力closeは、既に返されたPCM配列／AudioBufferやtoVideoFrameの別所有フレームまでは閉じません。
 
 Mediabunny 1.61.0のreturn単体では背景デコーダー終了を待てないため、内部の二つのinstance hookを
-`src/decoder-session.ts` で限定的に接続しています。公開APIだけの実装ではありません。
+`src/decoder-session.ts` で限定的に接続しています。この処理は従来のopenMediaだけが使います。
+/publicは `src/public-decoder-session.ts` から公開iterator.returnだけを呼びます。
 実際のdecoder.closeの観測と、別タスクを残さないパケット逐次取得を組み合わせています。
 依存は1.61.0へ完全固定し、更新時には初期化中／next待機中／yield中の中止・再開テストを必須とします。
 

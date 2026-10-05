@@ -1,17 +1,36 @@
-# Browser Media I/O — 0.2.0
+# Browser Media I/O — 0.2.1
 
 Webアプリに、メディアの **入力・情報取得・MP4/MP3出力** を追加するTypeScriptライブラリです。
 ブラウザ内で処理し、画面録画やサーバー側の動画変換を必要としません。
 字幕描画、スペアナ、動画編集、合成などは利用アプリで実装できます。
 
-**[0.2.0のリリースZIP](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.zip)** ／ [導入ガイド](docs/GETTING_STARTED.md) ／ [変更履歴](CHANGELOG.md)
+**[0.2.1の配布ZIP（Release添付用）](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.1.zip)** ／ [導入ガイド](docs/GETTING_STARTED.md) ／ [変更履歴](CHANGELOG.md)
 
 ZIPにはインストール用tgz、ビルド済みJS・型定義、ソース、利用例、テスト、ライセンスをまとめています。
-展開後の `packages/browser-media-io-0.2.0.tgz` を利用アプリへインストールしてください。
+展開後の `packages/browser-media-io-0.2.1.tgz` を利用アプリへインストールしてください。
 [同梱構成・再ビルド手順](docs/BUILDING.md)も用意しています。
 
 MP4関連の公開APIと制御処理は、Mediabunnyのコンテナ解析・格納／コーデック機能の上に実装しています。
 MP3出力は独立したモジュールで、同梱のLAME系エンコーダーを使用します。
+
+## 入力APIを選ぶ
+
+0.2.1では、Mediabunnyの公開APIだけを使う入口を追加しました。関数名・引数・返却値は既存APIと共通です。
+
+```ts
+// 内部メソッドへの接続コードを読み込まない入口
+import { openMedia, probe, createMp4Writer } from 'browser-media-io/public';
+const media = await openMedia(file);
+```
+
+従来の `import { openMedia } from 'browser-media-io'` は、旧デコーダーのcloseまで待つ終了保証を維持します。
+`/public` の `await reader.return()` は、進行中nextの終了・未返却結果の破棄・排他解除まで待ちます。
+その後は次の読み取りを開始できますが、Mediabunnyの後片付けが一時的に重なる場合があります。
+本パッケージは両APIを含むため、Mediabunny 1.61.0の固定は継続します。
+[契約の比較](docs/API.md#入力apiの選択021) ／ [利用例](examples/public-input.ts) ／ [0.2.1の検証結果](docs/VALIDATION_0.2.1.md)。
+
+公開済み0.2.0の正式な配布先は [GitHub Releases](https://github.com/cityedge/browser-media-i-o/releases) です。
+今回の0.2.1 ZIPはリポジトリに用意し、0.2.0の配布物は保持しています。
 
 ## できること
 
@@ -81,10 +100,10 @@ npm pack
 ```
 
 生成されたパッケージを自作アプリにインストールします。
-[ビルド済み0.2.0パッケージ](https://github.com/cityedge/browser-media-i-o/blob/main/downloads/browser-media-io/README.md) も用意しています。
+[ビルド済み0.2.1パッケージ](https://github.com/cityedge/browser-media-i-o/blob/main/downloads/browser-media-io/README.md) も用意しています。
 
 ```sh
-npm install --save-exact /path/to/browser-media-io-0.2.0.tgz mediabunny@1.61.0
+npm install --save-exact /path/to/browser-media-io-0.2.1.tgz mediabunny@1.61.0
 # ネイティブAAC非対応環境でもAAC出力したい場合のみ
 npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
@@ -171,7 +190,7 @@ npm run test:report    # HTMLレポート
 npm run test:web:ui    # Playwright UI
 npm run fixtures      # テスト素材のみ生成
 npm run test:mp3      # MP3出力・WAV/MP3サンプルだけ検証
-npm run package:release # 0.2.0のリリースZIPとSHA-256を生成（zipコマンドが必要）
+npm run package:release # 0.2.1の配布ZIP（Release添付用）とSHA-256を生成（zipコマンドが必要）
 npm run package:mp3   # 単独JSの配布ZIPを生成（開発時のみzipコマンドが必要）
 ```
 

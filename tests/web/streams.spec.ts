@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 import type {} from './harness/main';
 
-test.beforeEach(async ({ page }) => { await page.goto('/'); await page.waitForFunction(() => !!window.mediaHarness); });
+for (const entry of ['strict', 'public'] as const) test.describe(entry, () => {
+
+test.beforeEach(async ({ page }) => { await page.goto(entry === 'public' ? '/?input=public' : '/'); await page.waitForFunction(() => !!window.mediaHarness); });
 
 test('sequential B/VFR/offset/gap frames agree with independent FFprobe timing', async ({ page }) => {
   const result = await page.evaluate(async () => {
@@ -66,7 +68,7 @@ test('half-open boundaries, actual gaps, early offsets and independent repeated 
   expect(result.independent).toBe(true);
 });
 
-test('abort/return during initialization, pending next and paused yield joins real decoders before reuse', async ({ page }) => {
+test('video cancellation during initialization, next and yield preserves reuse and releases decoders', async ({ page }, info) => {
   const result = await page.evaluate(async () => {
     const { api, file } = window.mediaHarness;
     const Native = VideoDecoder, live = new Set<VideoDecoder>();
@@ -80,6 +82,12 @@ test('abort/return during initialization, pending next and paused yield joins re
     };
     const input = await api.openMedia(await file('/reference.mp4'));
     const failures: string[] = [], postReturn = [], held = [];
+    const settled: number[] = [];
+    const settle = async () => {
+      const deadline = performance.now() + 5000;
+      while (live.size && performance.now() < deadline) await new Promise(r => setTimeout(r, 10));
+      settled.push(live.size);
+    };
     try {
       for (let n = 0; n < 36; n++) {
         const controller = new AbortController();
@@ -97,6 +105,7 @@ test('abort/return during initialization, pending next and paused yield joins re
         }
         await reader.return(); postReturn.push(live.size);
         const next = await input.getVideoFrame((8 - n % 9) + .01); next!.close(); postReturn.push(live.size);
+        if (n % 6 === 5) await settle();
       }
       // A slow consumer must stop the decoder producer, not build an unbounded queue.
       const slow = input.videoFrames(); (await slow.next()).value!.close();
@@ -105,12 +114,16 @@ test('abort/return during initialization, pending next and paused yield joins re
       await slow.return();
       const finalReader = input.videoFrames(), final = (await finalReader.next()).value!;
       input.close(); await finalReader.return();
-      return { created, peak, postReturn, failures, held, queuedWhilePaused: after - before, closedOnInputClose: final.closed };
+      return { created, peak, postReturn, settled, failures, held, queuedWhilePaused: after - before, closedOnInputClose: final.closed };
     } finally { input.close(); window.VideoDecoder = Native; }
   });
   expect(result.created).toBeGreaterThan(40);
-  expect(result.peak).toBe(1);
-  expect(result.postReturn.every(n => n === 0)).toBe(true);
+  if (entry === 'strict') {
+    expect(result.peak).toBe(1);
+    expect(result.postReturn.every(n => n === 0)).toBe(true);
+  }
+  expect(result.settled).toEqual([0, 0, 0, 0, 0, 0]);
+  await info.attach('reader-cleanup.json', { body: JSON.stringify({ entry, kind: 'video', ...result }), contentType: 'application/json' });
   expect(result.failures.every(code => code === 'ABORTED')).toBe(true);
   expect(result.held.every(Boolean)).toBe(true);
   expect(result.queuedWhilePaused).toBe(0);
@@ -172,7 +185,7 @@ test('PCM slices are sample exact and remain usable after input closes', async (
   expect(result.detached).toBe(true); expect(result.transferred).toBeGreaterThan(0);
 });
 
-test('AAC PCM readers join native decoders at initialization, next and yield cancellation points', async ({ page }) => {
+test('AAC PCM cancellation preserves reuse and releases native decoders', async ({ page }, info) => {
   const result = await page.evaluate(async () => {
     const { api, file } = window.mediaHarness, Native = AudioDecoder;
     const live = new Set<AudioDecoder>(); let peak = 0, created = 0;
@@ -180,7 +193,7 @@ test('AAC PCM readers join native decoders at initialization, next and yield can
       constructor(init: AudioDecoderInit) { super(init); live.add(this); created++; peak = Math.max(peak, live.size); }
       close() { try { super.close(); } finally { live.delete(this); } }
     };
-    const input = await api.openMedia(await file('/reference.mp4')), counts = [], codes = [];
+    const input = await api.openMedia(await file('/reference.mp4')), counts = [], codes = [], settled = [];
     try {
       for (let n = 0; n < 18; n++) {
         const controller = new AbortController(), reader = input.audioPcmBlocks({ start: n % 8, signal: controller.signal, maxBlockSamples: 97 });
@@ -195,12 +208,21 @@ test('AAC PCM readers join native decoders at initialization, next and yield can
         const block = (await fresh.next()).value!;
         if (block.timestamp < 8 - n % 8) throw new Error('Old PCM appeared in a new read');
         await fresh.return(); counts.push(live.size);
+        if (n % 6 === 5) {
+          const deadline = performance.now() + 5000;
+          while (live.size && performance.now() < deadline) await new Promise(r => setTimeout(r, 10));
+          settled.push(live.size);
+        }
       }
-      return { created, peak, counts, codes };
+      return { created, peak, counts, codes, settled };
     } finally { input.close(); window.AudioDecoder = Native; }
   });
-  expect(result.created).toBeGreaterThan(18); expect(result.peak).toBe(1);
-  expect(result.counts.every(n => n === 0)).toBe(true);
+  expect(result.created).toBeGreaterThan(18); if (entry === 'strict') {
+    expect(result.peak).toBe(1);
+    expect(result.counts.every(n => n === 0)).toBe(true);
+  }
+  expect(result.settled).toEqual([0, 0, 0]);
+  await info.attach('reader-cleanup.json', { body: JSON.stringify({ entry, kind: 'audio', ...result }), contentType: 'application/json' });
   expect(result.codes.every(code => code === 'ABORTED')).toBe(true);
 });
 
@@ -220,4 +242,6 @@ test('requested times are lazy and outstanding frame limits survive reader retur
     } finally { await reader.return(); input.close(); }
   });
   expect(result).toEqual({ consumed: 2, finalized: true, code: 'RESOURCE_LIMIT', stillOwned: true, timestamp: 1 });
+});
+
 });

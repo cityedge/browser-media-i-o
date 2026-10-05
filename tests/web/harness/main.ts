@@ -1,6 +1,9 @@
 // Tests consume the built package through its public exports, just like an application.
-import { getCapabilities, openMedia, probe, decodeAudio, renderMp4, createMp4Writer, frameTime, MediaError,
-  type ExportProgress, type PositionedWrite } from 'browser-media-io';
+import * as strictApi from 'browser-media-io';
+import * as publicApi from 'browser-media-io/public';
+import type { ExportProgress, PositionedWrite } from 'browser-media-io';
+const { getCapabilities, openMedia, probe, decodeAudio, renderMp4, createMp4Writer, frameTime, MediaError } =
+  new URLSearchParams(location.search).get('input') === 'public' ? publicApi : strictApi;
 import { enableAacFallback } from 'browser-media-io/aac';
 import { twoVideos, grayRoundtrip, croppedUpload } from './gpu';
 import { measureReads, longExport } from './performance';
@@ -11,7 +14,7 @@ async function file(url: string) {
   return response.blob();
 }
 async function capabilities() {
-  return { adapter: 'browser-media-io@0.2.0', userAgent: navigator.userAgent,
+  return { adapter: 'browser-media-io@0.2.1', userAgent: navigator.userAgent,
     ...await getCapabilities({ width: 320, height: 180, videoBitrate: 1_000_000 }) };
 }
 function identify(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {

@@ -1,4 +1,4 @@
-# 導入ガイド — 0.2.0
+# 導入ガイド — 0.2.1
 
 Browser Media I/Oは、Webアプリにメディアの入力・情報取得・MP4／MP3出力を加えるライブラリです。
 描画、字幕、音声ミックス、編集タイムラインはアプリ側で用意します。
@@ -17,17 +17,17 @@ MP4側はHTTPSまたはlocalhostで実行し、WebCodecsの利用可否を確認
 
 ## ZIPを展開してパッケージをインストール
 
-配布ファイルは `browser-media-io-0.2.0.zip` です。展開すると同名のフォルダーができます。
-ZIPルートの `packages/` に、インストール用の `browser-media-io-0.2.0.tgz` が入っています。
+配布ファイルは `browser-media-io-0.2.1.zip` です。展開すると同名のフォルダーができます。
+ZIPルートの `packages/` に、インストール用の `browser-media-io-0.2.1.tgz` が入っています。
 利用先アプリの `package.json` があるディレクトリで、実際のパスを指定します。
 
 ```sh
-npm install --save-exact /path/to/browser-media-io-0.2.0/packages/browser-media-io-0.2.0.tgz mediabunny@1.61.0
+npm install --save-exact /path/to/browser-media-io-0.2.1/packages/browser-media-io-0.2.1.tgz mediabunny@1.61.0
 # ネイティブAAC非対応環境でもAAC出力する場合
 npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
 
-Windowsでは引用符で囲んだパス（例: `npm install --save-exact "C:/Downloads/browser-media-io-0.2.0/packages/browser-media-io-0.2.0.tgz" mediabunny@1.61.0`）も使えます。
+Windowsでは引用符で囲んだパス（例: `npm install --save-exact "C:/Downloads/browser-media-io-0.2.1/packages/browser-media-io-0.2.1.tgz" mediabunny@1.61.0`）も使えます。
 まだnpmレジストリへ公開していないため、パッケージ名だけの `npm install browser-media-io` は導入手順ではありません。
 Mediabunny 1.61.0は依存としてnpmが取得します。このZIPにnode_modulesは含めていません。
 インストールにはnpmレジストリへの接続が必要ですが、変換処理そのものはブラウザ内で完結します。
@@ -39,6 +39,21 @@ Mediabunnyはアプリ側にも1.61.0を完全固定します。AAC拡張は同�
 
 MP4のES Modulesはバンドラーでアプリに組み込んでください。`dist/index.js` を通常のscriptタグに直接指定する形式ではありません。
 MP3の `dist/standalone/browser-mp3.js` は、エンコーダーを含む通常script用の別配布です。
+
+## 内部APIへの接続を避ける場合
+
+```ts
+import { openMedia, probe, createMp4Writer } from 'browser-media-io/public';
+```
+
+既存の `browser-media-io` と同じ関数名で利用できます。映像・音声の読み取り機能は同じです。
+/publicからはMediabunnyの非公開メソッドを差し替えるコードを読み込みません。
+キャンセル時は `abort()` と `await reader.return()` を行ってから次の読み取りへ進みます。
+returnが完了しても基盤の後片付けが一時的に続く可能性があります。
+旧デコーダーのclose完了まで待つ必要があるアプリは、従来の `browser-media-io` を選んでください。
+[終了保証の比較](API.md#入力apiの選択021) ／ [読み取りの利用例](../examples/public-input.ts)。
+
+この選択でパッケージの依存バージョンは変わりません。上記のMediabunny／AAC拡張の導入条件は両方に適用します。
 
 ## 最小のMP4出力
 

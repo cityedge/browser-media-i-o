@@ -82,9 +82,10 @@ try {
   });
   await writeFile(path.join(temp, 'SHA256SUMS'),
     `${await digest(zip)}  ${name}.zip\n${await digest(path.join(temp, `${name}.tgz`))}  ${name}.tgz\n`);
+  await cp(path.join(temp, 'SHA256SUMS'), path.join(temp, `${name}.sha256`));
   await mkdir(destination, { recursive: true });
   // Only replace the completed outputs; a failed build/link check leaves the old release intact.
-  for (const file of [`${name}.zip`, `${name}.tgz`, 'SHA256SUMS']) {
+  for (const file of [`${name}.zip`, `${name}.tgz`, `${name}.sha256`, 'SHA256SUMS']) {
     const pending = path.join(destination, `${file}.new`);
     await cp(path.join(temp, file), pending);
     await rename(pending, path.join(destination, file));

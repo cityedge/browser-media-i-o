@@ -15,7 +15,7 @@ npm run typecheck
 
 出力先は `dist/`、通常HTML用MP3は `dist/standalone/` です。
 依存はインターネットからnpmが取得します。ビルドにはFFmpeg／Chromiumは不要です。
-利用アプリへの導入には、あらかじめ同梱した `packages/browser-media-io-0.2.0.tgz` も使えます。
+利用アプリへの導入には、あらかじめ同梱した `packages/browser-media-io-0.2.1.tgz` も使えます。
 新たにインストール用パッケージを作る場合は `npm pack` を実行してください。
 
 ## テストと評価アプリ
@@ -28,7 +28,7 @@ npm test
 npm run app:dev
 ```
 
-npm testはビルド、型検査、素材生成、Webの48件とFramecraftの6件を実行します。
+npm testはビルド、型検査、素材生成、Webの59件とFramecraftの6件を実行します。
 Webテストは素材を生成してからViteを起動するため、初回展開時にも準備コマンドを追加する必要はありません。
 Framecraftは同じ端末のブラウザでlocalhost:4174から利用できます。
 詳しい条件・Windowsでのブラウザ指定は [評価レポート](VALIDATION_0.2.md) を参照してください。
@@ -52,11 +52,13 @@ npm run package:release
 
 ライブラリをクリーンビルドし、`downloads/browser-media-io/` に次を生成します。
 
-- `browser-media-io-0.2.0.zip`：ビルド済み成果物と再ビルド用ソース一式。
-- `browser-media-io-0.2.0.tgz`：npm install用。同一ファイルをZIP内packages/にも格納。
-- `SHA256SUMS`：配布ZIPとtgzのSHA-256。
+- `browser-media-io-0.2.1.zip`：ビルド済み成果物と再ビルド用ソース一式。
+- `browser-media-io-0.2.1.tgz`：npm install用。同一ファイルをZIP内packages/にも格納。
+- `SHA256SUMS`、`browser-media-io-0.2.1.sha256`：配布ZIPとtgzのSHA-256。
 
-ZIPは一つの `browser-media-io-0.2.0/` フォルダーに展開されます。ルートのSHA256SUMSには内部の各ファイルのハッシュがあります。
+過去のZIP・tgzは上書きしません。0.2.0のハッシュと検証記録はバージョン付きの別ファイルに保持しています。
+
+ZIPは一つの `browser-media-io-0.2.1/` フォルダーに展開されます。ルートのSHA256SUMSには内部の各ファイルのハッシュがあります。
 作成スクリプトは明示したファイル・ディレクトリだけを採用し、ビルドやテストの残骸を除外します。
 Git情報やnode_modulesを配布しません。Markdownの相対リンクも検査します。
 ファイル順、権限、ZIPの時刻を揃えて作成します。同じソース・依存・ツールでの再生成時に差を比較できます。

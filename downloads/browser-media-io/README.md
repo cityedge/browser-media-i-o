@@ -1,16 +1,18 @@
-# Browser Media I/O 0.2.0 リリース
+# Browser Media I/O 0.2.1 リリース
 
-[**リリースZIPをダウンロード**](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.zip) ／ [SHA-256](SHA256SUMS)
+[**リリースZIPをダウンロード**](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.1.zip) ／ [SHA-256](SHA256SUMS)
 
-2026-10-04（日本時間）に配布構成と文書を整備しました。ライブラリ本体は0.2.0のままです。
-[導入ガイド](../../docs/GETTING_STARTED.md) ／ [変更履歴](../../CHANGELOG.md) ／ [API](../../docs/API.md) ／ [検証結果](../../docs/VALIDATION_0.2.md)
+Mediabunnyの公開APIだけを使う入口を追加した0.2.1の配布物です。GitHub Releaseへ添付できるZIPを用意しています。
+公開済み0.2.0の正式な配布先は [GitHub Releases](https://github.com/cityedge/browser-media-i-o/releases) です。
+0.2.0のZIP・tgzは保持し、[ハッシュ](browser-media-io-0.2.0.sha256) と [検証記録](VERIFICATION-0.2.0.json) も残しています。
+[導入ガイド](../../docs/GETTING_STARTED.md) ／ [変更履歴](../../CHANGELOG.md) ／ [API](../../docs/API.md) ／ [今回の検証結果](../../docs/VALIDATION_0.2.1.md)
 
-ZIPを展開すると `browser-media-io-0.2.0/` フォルダーができます。
+ZIPを展開すると `browser-media-io-0.2.1/` フォルダーができます。
 
 | パス | 内容 |
 |---|---|
 | `README.md`、`CHANGELOG.md` | 案内と変更履歴 |
-| `packages/browser-media-io-0.2.0.tgz` | 利用アプリにnpm installするパッケージ |
+| `packages/browser-media-io-0.2.1.tgz` | 利用アプリにnpm installするパッケージ |
 | `dist/` | ビルド済みES Modules、TypeScript型定義 |
 | `dist/standalone/` | HTML用MP3の単独JSと動作サンプル |
 | `src/`、`package-lock.json`、設定ファイル | ライブラリのソースと固定したビルド依存 |
@@ -24,12 +26,12 @@ node_modules、Git情報、生成テスト動画、一時ファイル、過去�
 ZIPのままアプリを起動する形式ではありません。利用先プロジェクトで、同梱tgzをインストールします。
 
 ```sh
-npm install --save-exact /path/to/browser-media-io-0.2.0/packages/browser-media-io-0.2.0.tgz mediabunny@1.61.0
+npm install --save-exact /path/to/browser-media-io-0.2.1/packages/browser-media-io-0.2.1.tgz mediabunny@1.61.0
 # ネイティブAAC非対応環境にも対応する場合
 npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
 
-[tgzだけをダウンロード](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.0.tgz) することもできます。
+[tgzだけをダウンロード](https://github.com/cityedge/browser-media-i-o/raw/refs/heads/main/downloads/browser-media-io/browser-media-io-0.2.1.tgz) することもできます。
 Mediabunny 1.61.0はnpmが取得します。本体とAAC拡張で同じ基盤を共有するため、上記のとおりアプリ側にも完全固定してください。MP4側はVite等でアプリに組み込み、HTTPS／localhostで実行します。
 MP3保存だけを通常HTMLに追加する場合は `dist/standalone/browser-mp3.js` を使用してください。
 詳細は同梱の導入ガイドにあります。
@@ -39,7 +41,7 @@ MP3保存だけを通常HTMLに追加する場合は `dist/standalone/browser-mp
 このページのSHA256SUMSは配布ZIPとtgz、ZIP内部のSHA256SUMSは展開後の個別ファイルが対象です。
 Linuxでは同じ場所に保存して `sha256sum -c SHA256SUMS`、macOSでは `shasum -a 256 -c SHA256SUMS` を実行できます。
 ZIPだけをダウンロードした場合はtgz行の欠落表示を区別してください。
-Windows PowerShellでは `Get-FileHash ./browser-media-io-0.2.0.zip -Algorithm SHA256` の結果を対応する行と比較します。
+Windows PowerShellでは `Get-FileHash ./browser-media-io-0.2.1.zip -Algorithm SHA256` の結果を対応する行と比較します。
 
 ## ビルド・再配布
 
@@ -50,9 +52,19 @@ Node.js 22.12以降で、展開したルートから `npm ci` → `npm run build
 
 この配布ファイルの作成はnpmレジストリへの公開ではありません。
 
+## 公開API版を使う
+
+```ts
+import { openMedia, probe, createMp4Writer } from 'browser-media-io/public';
+```
+
+従来のルートからのimportも維持しています。/publicは内部接続アダプターを読み込まず、
+return完了後に基盤の後片付けが続く場合があります。終了保証の違いは [API](../../docs/API.md#入力apiの選択021) を参照してください。
+依存のMediabunnyは従来APIとの共存のため1.61.0を維持します。
+
 ## 今回の配布検証
 
-ZIPを新規フォルダーへ展開し、npm ci、ビルド・型検査、Playwright 54件が成功しました。
-同梱ソースから再作成したZIPはバイト単位で一致しています。既存0.2.0のJS・型定義30ファイルも同一です。
-別アプリへのtgz導入ではMP4の30フレーム／48,000サンプルの入出力と、MP3出力・単独script版との一致を確認しました。
-Linux Chromiumでの結果です。[検証記録](VERIFICATION.json) を参照してください。
+ビルド・型検査と65件の回帰テストが成功しました。ZIPの新規展開後にnpm ci・型検査・再ビルドを行い、再生成したZIPのバイト一致を確認しています。
+別アプリへtgzを導入し、/public経由のMP4 30フレーム／48,000サンプル往復、MP3出力、内部接続アダプターが依存グラフにないことを確認しました。
+[評価記録](../../docs/VALIDATION_0.2.1.md) と [配布検証JSON](VERIFICATION.json) を参照してください。
+Linux Chromiumで確認しています。Windows Chrome／Edgeは未検証です。
