@@ -29,12 +29,13 @@ Authors: Alex Zhukov, the LAME project and fork contributors.
 Unmodified encoder bundled into the MP3 Blob worker. The npm core MP4 entry does not include it.
 The classic all-in-one bundles and the dedicated BrowserMp3 script include it.
 
-third_party/lamejs/source.tar.gz contains corresponding upstream source/build files.
-COPYING and COPYING.LESSER contain GPLv3 and LGPLv3. The standalone MP3 ZIP also includes these files.
+In the repository and matching source ZIP, third_party/lamejs/source.tar.gz contains corresponding
+upstream source/build files. COPYING and COPYING.LESSER contain GPLv3 and LGPLv3.
+The standalone MP3 ZIP includes these license texts; the source archive is in the matching source ZIP.
 
 ## Source availability and replacement
 
-The classic-script ZIP contains the library, optional example, notices and license texts.
+The classic-script and standalone MP3 ZIPs contain the library, optional example, notices and license texts.
 The matching browser-media-io-sources-<version>.zip contains our wrapper/build sources and lockfile,
 LAME's corresponding source, and the complete Mediabunny v1.61.0 source archive including AAC build inputs.
 Publish the matching source ZIP alongside the binaries on
@@ -42,7 +43,7 @@ Publish the matching source ZIP alongside the binaries on
 Provenance and fixed hashes for downloaded materials are recorded in third_party/SOURCES.json.
 
 See [source and rebuilding instructions](https://github.com/cityedge/browser-media-i-o/blob/main/docs/SOURCES.md)
-(also SOURCES.md in the classic-script ZIP). Modified dependencies can be rebuilt and relinked into the
+(also SOURCES.md in both binary ZIPs). Modified dependencies can be rebuilt and relinked into the
 classic scripts; no signing key is required. Preserve notices, licenses and source availability when redistributing.
 The original wrapper's MIT license does not replace dependency licenses.
 

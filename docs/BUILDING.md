@@ -23,7 +23,7 @@ npm run typecheck
 
 ```sh
 npm run package:browser  # 組み込み用JS + ライセンス + 任意サンプル
-npm run package:mp3      # MP3専用JS + ライセンス + LAMEソース
+npm run package:mp3      # MP3専用JS + ライセンス + 対応ソースの入手案内
 npm run package:sources  # 本体と依存の対応ソース
 npm run package:release  # 上記すべて + npm用tgz + SHA256SUMS
 ```

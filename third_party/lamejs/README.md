@@ -13,5 +13,7 @@ https://lame.sourceforge.io/ . The wrapper's MIT license does not replace these 
 To rebuild the encoder, extract the archive, install its build dependencies
 (pnpm-lock.yaml / package.json) and run its `build` script. To replace the encoder
 in Browser MP3, install the rebuilt package in the wrapper's source project and
-run `npm run build`. The standalone distribution includes the wrapper source,
-build scripts and package lock so it can be rebuilt with a modified encoder.
+run `npm run build`. The matching `browser-media-io-sources-<version>.zip`
+includes this archive, the wrapper source, build scripts and package lock so it
+can be rebuilt with a modified encoder. The standalone MP3 ZIP includes the
+license texts and `SOURCES.md` with source download instructions.

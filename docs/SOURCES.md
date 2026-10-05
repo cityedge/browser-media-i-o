@@ -1,6 +1,6 @@
 # 対応ソースとエンコーダーの再ビルド
 
-通常script版の組み込み用ZIPと、変更・再ビルド用ソースを分離しています。
+通常script版・MP3専用版の組み込み用ZIPと、変更・再ビルド用ソースを分離しています。
 実行時にはソースZIPは不要です。再配布時は通知・ライセンスと対応ソースを入手できる案内を保持してください。
 
 [GitHub Releases](https://github.com/cityedge/browser-media-i-o/releases)でバイナリと同じ版の
@@ -11,7 +11,7 @@
 |---|---|
 | Browser Media I/O（MIT） | 対応ソースZIPのsrc/、scripts/、package-lock.json。またはこのリポジトリ |
 | Mediabunny / AAC拡張 1.61.0（MPL-2.0） | 対応ソースZIPのthird_party/mediabunny-1.61.0.tar.gz |
-| LAME系MP3エンコーダー 1.2.7（LGPL-3.0） | third_party/lamejs/source.tar.gz、COPYING、COPYING.LESSER |
+| LAME系MP3エンコーダー 1.2.7（LGPL-3.0） | 対応ソースZIPのthird_party/lamejs/source.tar.gz、COPYING、COPYING.LESSER |
 | AAC WASM内のFFmpeg | 上流AAC拡張のビルド手順とFFmpeg上流ソース |
 
 Mediabunny/AACの[固定版上流ソース](https://github.com/Vanilagy/mediabunny/tree/v1.61.0)には
@@ -48,3 +48,4 @@ MP3だけを変更する場合はthird_party/lamejs/source.tar.gz内の上流ビ
 
 本体のMITライセンスは依存ライブラリのライセンスを置き換えません。
 通常script版ZIPのlicenses/にはMPL-2.0、GPLv3、LGPLv3、FFmpegのLGPLv2.1全文を含めています。
+MP3専用ZIPのthird_party/lamejs/にはGPLv3・LGPLv3全文を含めています。
