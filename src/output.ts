@@ -4,6 +4,7 @@ import { abortable, checkAbort, fail, mediaError, MediaError, positive } from '.
 import { frameRateValue, frameTime, frameTiming, type FrameRate } from './time.js';
 import { aacPrimingSamples } from './aac-state.js';
 import { validatePcm, type PcmAudio } from './pcm.js';
+import { videoEncodingConfig, type VideoEncodingOptions, type VideoBitrateMode } from './video-encoding.js';
 
 export interface PositionedWrite { type: 'write'; data: Uint8Array<ArrayBuffer>; position: number }
 export type Mp4Target = { kind: 'blob'; maxBytes?: number } | { kind: 'stream'; stream: WritableStream<PositionedWrite> };
@@ -13,8 +14,8 @@ export interface ExportProgress {
   /** null when expectedFrames was not provided. Reaches 1 only after successful finalization. */
   fraction: number | null;
 }
-export interface WriterOptions {
-  width: number; height: number; fps: FrameRate; videoBitrate?: number;
+export interface WriterOptions extends VideoEncodingOptions {
+  width: number; height: number; fps: FrameRate;
   audio?: AudioOutputOptions; target?: Mp4Target; expectedFrames?: number;
   signal?: AbortSignal; onProgress?: (progress: ExportProgress) => void;
 }
@@ -22,6 +23,14 @@ export interface Mp4Result {
   blob: Blob | null; bytes: number; videoFrames: number; audioSamples: number;
   duration: number; width: number; height: number; fps: number;
   videoCodec: 'h264'; audioCodec: 'aac' | 'opus' | null;
+  videoBitrateMode: VideoBitrateMode;
+  /** Requested bitrate, null for CQP. This is not a measured output rate. */
+  videoBitrate: number | null;
+  videoQuantizer: number | null;
+  /** Encoded video packet bytes, excluding audio and MP4 overhead. */
+  videoBytes: number;
+  /** Measured videoBytes * 8 / duration, in bits per second. */
+  averageVideoBitrate: number;
 }
 
 // Fixed-size pages support MP4's positioned writes without a growing contiguous ArrayBuffer.
@@ -67,6 +76,7 @@ export class Mp4Writer {
   #pendingBackend?: Promise<void>;
   #busy = false;
   #videoFrames = 0;
+  #videoBytes = 0;
   #audioSamples = 0;
   #audioPriming = 0;
   #bytes = 0;
@@ -91,7 +101,8 @@ export class Mp4Writer {
     });
     this.#output = new Output({ format: new Mp4OutputFormat({ fastStart: false }),
       target: new StreamTarget(stream, { chunked: true, chunkSize: 1024 * 1024 }) });
-    this.#video = new VideoSampleSource({ codec: 'avc', bitrate: options.videoBitrate ?? 8_000_000, latencyMode: 'quality' });
+    this.#video = new VideoSampleSource({ codec: 'avc', ...videoEncodingConfig(options),
+      onEncodedPacket: packet => { this.#videoBytes += packet.data.byteLength; } });
     this.#output.addVideoTrack(this.#video, { frameRate: frameRateValue(options.fps) });
     if (options.audio) {
       this.#audioPriming = (options.audio.codec ?? 'aac') === 'aac' ? aacPrimingSamples() : 0;
@@ -227,7 +238,11 @@ export class Mp4Writer {
       o.signal?.removeEventListener('abort', this.#onAbort);
       const result: Mp4Result = { blob: this.#store?.blob() ?? null, bytes: this.#bytes, videoFrames: this.#videoFrames,
         audioSamples: this.#audioSamples, duration, width: o.width, height: o.height, fps: frameRateValue(o.fps),
-        videoCodec: 'h264', audioCodec: o.audio ? o.audio.codec ?? 'aac' : null };
+        videoCodec: 'h264', audioCodec: o.audio ? o.audio.codec ?? 'aac' : null,
+        videoBitrateMode: o.videoBitrateMode ?? 'variable',
+        videoBitrate: o.videoBitrateMode === 'quantizer' ? null : o.videoBitrate ?? 8_000_000,
+        videoQuantizer: o.videoBitrateMode === 'quantizer' ? o.videoQuantizer! : null,
+        videoBytes: this.#videoBytes, averageVideoBitrate: this.#videoBytes * 8 / duration };
       this.#progress('complete');
       return result;
     });
@@ -239,7 +254,7 @@ export async function createMp4Writer(options: WriterOptions): Promise<Mp4Writer
   checkAbort(options.signal);
   positive(options.width, 'width', true); positive(options.height, 'height', true);
   if (options.width % 2 || options.height % 2) fail('INVALID_ARGUMENT', 'H.264 output dimensions must be even.');
-  positive(options.videoBitrate ?? 8_000_000, 'videoBitrate', true);
+  videoEncodingConfig(options);
   if (frameRateValue(options.fps) < 1 || frameRateValue(options.fps) > 240) fail('INVALID_ARGUMENT', 'Output fps must be between 1 and 240.');
   if (options.expectedFrames !== undefined) positive(options.expectedFrames, 'expectedFrames', true);
   if (options.target?.kind === 'blob') positive(options.target.maxBytes ?? 256 * 1024 * 1024, 'maxBytes', true);
@@ -249,10 +264,12 @@ export async function createMp4Writer(options: WriterOptions): Promise<Mp4Writer
     positive(options.audio.bitrate ?? 192_000, 'audio.bitrate', true);
     if (options.audio.codec !== undefined && !['aac', 'opus'].includes(options.audio.codec)) fail('INVALID_ARGUMENT', 'Unsupported output audio codec.');
   }
-  const support = await getCapabilities({ width: options.width, height: options.height, fps: options.fps, videoBitrate: options.videoBitrate,
+  const support = await getCapabilities({ width: options.width, height: options.height, fps: options.fps,
+    videoBitrate: options.videoBitrate, videoBitrateMode: options.videoBitrateMode,
+    videoQuantizer: options.videoQuantizer, videoHardwareAcceleration: options.videoHardwareAcceleration,
     sampleRate: options.audio?.sampleRate, channels: options.audio?.channels, audioBitrate: options.audio?.bitrate });
   checkAbort(options.signal);
-  if (!support.h264Encode) fail('UNSUPPORTED', 'H.264 encoding is unavailable for this configuration.');
+  if (!support.h264Encode) fail('UNSUPPORTED', 'H.264 encoding is unavailable for this size, rate-control mode and encoder preference.');
   if (options.audio && !(options.audio.codec === 'opus' ? support.opusEncode : support.aacEncode)) {
     fail('UNSUPPORTED', options.audio.codec === 'opus' ? 'Opus encoding is unavailable.' : 'AAC encoding is unavailable. Enable the optional AAC fallback or explicitly select another supported codec.');
   }

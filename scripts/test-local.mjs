@@ -62,6 +62,13 @@ try {
     await page.locator('#source').setInputFiles(fixture);
     await expect(page.locator('#export-mp4')).toBeEnabled();
     await expect(page.locator('#preview')).toBeVisible();
+    await page.locator('#video-mode').selectOption('quantizer');
+    await expect(page.locator('#video-bitrate')).toBeDisabled();
+    await expect(page.locator('#video-quantizer')).toBeEnabled();
+    await page.locator('#video-mode').selectOption('constant');
+    await expect(page.locator('#video-bitrate')).toBeEnabled();
+    await expect(page.locator('#video-quantizer')).toBeDisabled();
+    await page.locator('#video-bitrate').fill('20');
     for (const format of ['mp4', 'mp3']) {
       await page.locator('#export-' + format).click();
       await expect(page.locator('#save-' + format)).toBeVisible({ timeout: 90000 });
@@ -73,8 +80,12 @@ try {
       assert.equal(await download.failure(), null);
       assert.ok((await stat(target)).size > 0);
       if (format === 'mp4') {
+        const metrics = JSON.parse(await page.locator('#diagnostics').textContent()).output;
+        assert.equal(metrics.videoBitrateMode, 'constant'); assert.equal(metrics.videoBitrate, 20_000_000);
+        assert.ok(metrics.averageVideoBitrate > 0 && metrics.videoBytes < metrics.bytes);
+        await expect(page.locator('#output-info')).toContainText('CBR');
         const { ffprobe: _info, ...media } = verifyMedia(target, 'aac', { pulseTolerance: 0.03 });
-        report.cases.push({ mode, format, ...media });
+        report.cases.push({ mode, format, ...media, encoding: metrics });
       } else {
         const media = probe(target), track = media.streams.find(t => t.codec_type === 'audio');
         assert.equal(track.codec_name, 'mp3'); assert.equal(track.channels, 2);
@@ -145,7 +156,8 @@ try {
         const first = await reader.next(); first.value.close(); await reader.return();
         const frame = await input.getVideoFrame(5); const timestamp = frame.timestamp; frame.close();
         const backend = await api.enableAacFallback({ width: 320, height: 180 });
-        const writer = await api.createMp4Writer({ width: 320, height: 180, fps: 30, audio: { sampleRate: 48000, channels: 2 } });
+        const writer = await api.createMp4Writer({ width: 320, height: 180, fps: 30, videoBitrateMode: 'constant', videoBitrate: 20_000_000,
+          audio: { sampleRate: 48000, channels: 2 } });
         const canvas = new OffscreenCanvas(320, 180);
         canvas.getContext('2d').fillRect(0, 0, 320, 180);
         for (let i = 0; i < 30; i++) {
@@ -160,12 +172,14 @@ try {
           for await (const block of decoded.audioPcmBlocks({ end: 1 })) samples += block.length;
         } finally { decoded.close(); }
         const mp3 = await api.encodeMp3({ sampleRate: 48000, numberOfChannels: 1, length: 48000, getChannelData: () => new Float32Array(48000) });
-        return { timestamp, backend, frames, samples, mp3Bytes: mp3.size, strictGlobalAbsent: !window.BrowserMediaIO };
+        return { timestamp, backend, frames, samples, mp3Bytes: mp3.size, strictGlobalAbsent: !window.BrowserMediaIO,
+          videoBitrateMode: output.videoBitrateMode, videoBitrate: output.videoBitrate, averageVideoBitrate: output.averageVideoBitrate };
       } finally { input.close(); }
     });
     assert.equal(result.timestamp, 5); assert.equal(result.backend, mode);
     assert.equal(result.frames, 30); assert.equal(result.samples, 48000);
     assert.ok(result.mp3Bytes > 0 && result.strictGlobalAbsent);
+    assert.equal(result.videoBitrateMode, 'constant'); assert.equal(result.videoBitrate, 20_000_000);
     report.cases.push({ mode, publicBundle: result });
     await context.close();
   }

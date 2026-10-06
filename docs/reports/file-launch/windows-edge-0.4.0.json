@@ -1,0 +1,168 @@
+{
+  "status": "passed",
+  "testedAt": "2026-10-06T00:37:43.583Z",
+  "offline": true,
+  "browserName": "edge",
+  "cases": [
+    {
+      "mode": "native",
+      "format": "mp4",
+      "videoFrames": 300,
+      "firstFrameId": 0,
+      "lastFrameId": 299,
+      "maxVideoTimingError": 3.333333342681044e-7,
+      "decodedAudioSamples": 480256,
+      "pulseStarts": [
+        [
+          1,
+          4,
+          8
+        ],
+        [
+          2,
+          5,
+          9
+        ]
+      ],
+      "audioCodec": "aac",
+      "encoding": {
+        "format": "mp4",
+        "bytes": 260124,
+        "videoFrames": 300,
+        "audioSamples": 480000,
+        "duration": 10,
+        "width": 320,
+        "height": 180,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": "aac",
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 15544,
+        "averageVideoBitrate": 12435.2
+      }
+    },
+    {
+      "mode": "native",
+      "format": "mp3",
+      "codec": "mp3",
+      "duration": 10.032
+    },
+    {
+      "mode": "native",
+      "capabilities": {
+        "secureContext": true,
+        "h264Encode": true,
+        "aacEncode": true,
+        "nativeAacEncode": true,
+        "opusEncode": true
+      },
+      "aacBackend": "native"
+    },
+    {
+      "cancellationAndRetry": "passed",
+      "invalidInput": "passed",
+      "audioOnly": "passed",
+      "delayedAudioErrorSeconds": 0,
+      "languages": [
+        "ja",
+        "en"
+      ],
+      "viewports": [
+        "1200x1000",
+        "390x844"
+      ]
+    },
+    {
+      "mode": "native",
+      "publicBundle": {
+        "timestamp": 5,
+        "backend": "native",
+        "frames": 30,
+        "samples": 48000,
+        "mp3Bytes": 24768,
+        "strictGlobalAbsent": true,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "averageVideoBitrate": 3440
+      }
+    },
+    {
+      "mode": "wasm",
+      "format": "mp4",
+      "videoFrames": 300,
+      "firstFrameId": 0,
+      "lastFrameId": 299,
+      "maxVideoTimingError": 3.333333342681044e-7,
+      "decodedAudioSamples": 480256,
+      "pulseStarts": [
+        [
+          1,
+          4,
+          8
+        ],
+        [
+          2,
+          5,
+          9
+        ]
+      ],
+      "audioCodec": "aac",
+      "encoding": {
+        "format": "mp4",
+        "bytes": 39642,
+        "videoFrames": 300,
+        "audioSamples": 480000,
+        "duration": 10,
+        "width": 320,
+        "height": 180,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": "aac",
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 15544,
+        "averageVideoBitrate": 12435.2
+      }
+    },
+    {
+      "mode": "wasm",
+      "format": "mp3",
+      "codec": "mp3",
+      "duration": 10.032
+    },
+    {
+      "mode": "wasm",
+      "capabilities": {
+        "secureContext": true,
+        "h264Encode": true,
+        "aacEncode": false,
+        "nativeAacEncode": false,
+        "opusEncode": true
+      },
+      "aacBackend": "wasm"
+    },
+    {
+      "mode": "wasm",
+      "publicBundle": {
+        "timestamp": 5,
+        "backend": "wasm",
+        "frames": 30,
+        "samples": 48000,
+        "mp3Bytes": 24768,
+        "strictGlobalAbsent": true,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "averageVideoBitrate": 3440
+      }
+    }
+  ],
+  "network": [],
+  "errors": [],
+  "zipSha256": "689f058efcb85266d401196aa9368cce5fccb3ac0bc804ea38a7ef5bd278d285",
+  "verifiedFiles": 14,
+  "browser": "154.0.4258.37",
+  "platform": "win32"
+}

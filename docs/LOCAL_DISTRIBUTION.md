@@ -5,7 +5,7 @@
 
 ## 配置するファイル
 
-`browser-media-io-browser-0.3.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
+`browser-media-io-browser-0.4.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
 再配布時は通知・ライセンス・対応ソースの案内も保持してください。
 
 | ファイル | グローバル名 | 入力終了の契約 |
@@ -87,6 +87,10 @@ ZIP内の `examples/local/index.html` を直接開くと、ファイル選択 �
 日英切替・ダークテーマに対応しています。このサンプルだけに60秒・音声PCM128 MiB・出力128 MiBの上限があります。
 MP4は最大1280×720・30fpsに変換し、音声のみの素材には背景を生成します。
 ライブラリ自体に60秒の固定上限があるわけではありません。
+0.4.0からVBR・CBR・CQP、目標映像Mbpsまたは量子化値、エンコーダー優先を設定できます。
+完成後は要求設定と実測平均映像Mbpsを表示します。非対応の設定では変更を案内します。
+ライブラリへは `videoBitrateMode`、`videoBitrate` / `videoQuantizer`、`videoHardwareAcceleration` を渡します。
+映像の制御方式はVBR/CBR/CQPに対応しますが、目標Mbpsとの厳密な一致は保証しません。
 
 ## 開発者による生成
 
@@ -95,7 +99,7 @@ npm ci
 npm run package:browser
 ```
 
-通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.3.0.zip`。
+通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.4.0.zip`。
 対応ソースZIPは `npm run package:sources` で別途生成します。
 利用者のPCにはNode.js・サーバー・ネット接続は不要です。
 

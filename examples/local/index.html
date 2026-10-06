@@ -23,9 +23,17 @@
     <section>
       <h2 data-i18n="outputTitle">2. 書き出す</h2>
       <p data-i18n="limits" class="muted">サンプルの上限: 60秒・音声PCM 128 MiB・出力128 MiB。MP4は最大1280 × 720、30 fps。音声のみの場合は背景画像を生成します。</p>
+      <div class="encoding-settings">
+        <label><span data-i18n="rateMode">映像レート制御</span><select id="video-mode"><option value="variable">VBR</option><option value="constant">CBR</option><option value="quantizer">CQP</option></select></label>
+        <label><span data-i18n="bitrate">目標映像ビットレート（Mbps）</span><input id="video-bitrate" type="number" min="0.001" step="0.001" value="8" required></label>
+        <label><span data-i18n="quantizer">量子化値（0–51、小さいほど高画質）</span><input id="video-quantizer" type="number" min="0" max="51" step="1" value="23" required disabled></label>
+        <label><span data-i18n="encoder">エンコーダー優先</span><select id="video-hardware"><option value="no-preference" data-i18n="automatic">自動</option><option value="prefer-hardware" data-i18n="hardware">ハードウェア優先</option><option value="prefer-software" data-i18n="software">ソフトウェア優先</option></select></label>
+      </div>
+      <p data-i18n="rateHelp" class="muted">VBR/CBRは目標値です。CQPはビットレートを指定せず画質を制御します。利用可能な方式は環境によって異なります。</p>
       <div class="actions"><button id="export-mp4" disabled data-i18n="mp4">MP4を作成</button><button id="export-mp3" disabled data-i18n="mp3">MP3を作成</button><button id="cancel" hidden data-i18n="cancel">中止</button></div>
       <progress id="progress" max="1" value="0" hidden></progress>
       <p id="status" role="status" aria-live="polite"></p>
+      <p id="output-info" class="muted"></p>
       <p id="error" role="alert" hidden></p>
       <div class="actions"><a id="save-mp4" hidden data-i18n="saveMp4">MP4を保存</a><a id="save-mp3" hidden data-i18n="saveMp3">MP3を保存</a></div>
     </section>

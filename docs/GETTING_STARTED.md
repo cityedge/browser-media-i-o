@@ -1,4 +1,4 @@
-# 導入ガイド — 0.3.0
+# 導入ガイド — 0.4.0
 
 利用アプリをローカルサーバーなしで動かす場合は、通常script版JSをアプリのHTMLから読み込みます。
 通常scriptでの導入方法と制限は [ローカルHTML配布](LOCAL_DISTRIBUTION.md) を参照してください。
@@ -22,17 +22,17 @@ ES Modules版はHTTPSまたはlocalhostで実行し、WebCodecsの利用可否�
 
 ## npm用tgzをインストール
 
-配布ファイルは `browser-media-io-0.3.0.tgz` です。
+配布ファイルは `browser-media-io-0.4.0.tgz` です。
 GitHub Releasesから取得するか、ソースでnpm ci → npm run build → npm packを実行して生成します。
 利用先アプリの `package.json` があるディレクトリで、実際のパスを指定します。
 
 ```sh
-npm install --save-exact /path/to/browser-media-io-0.3.0.tgz mediabunny@1.61.0
+npm install --save-exact /path/to/browser-media-io-0.4.0.tgz mediabunny@1.61.0
 # ネイティブAAC非対応環境でもAAC出力する場合
 npm install --save-exact @mediabunny/aac-encoder@1.61.0
 ```
 
-Windowsでは引用符で囲んだパス（例: `npm install --save-exact "C:/Downloads/browser-media-io-0.3.0.tgz" mediabunny@1.61.0`）も使えます。
+Windowsでは引用符で囲んだパス（例: `npm install --save-exact "C:/Downloads/browser-media-io-0.4.0.tgz" mediabunny@1.61.0`）も使えます。
 まだnpmレジストリへ公開していないため、パッケージ名だけの `npm install browser-media-io` は導入手順ではありません。
 Mediabunny 1.61.0は依存としてnpmが取得します。tgzにnode_modulesは含めていません。
 インストールにはnpmレジストリへの接続が必要ですが、変換処理そのものはブラウザ内で完結します。

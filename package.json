@@ -1,6 +1,6 @@
 {
   "name": "browser-media-io",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Browser media probing, decoding, MP4 rendering and standalone MP3 export",

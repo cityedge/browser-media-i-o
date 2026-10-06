@@ -27,13 +27,16 @@ AACのWASMとMP3 Workerも同梱済みです。利用時にNode.js・ローカ�
 
 | 導入方法 | 利用するもの |
 |---|---|
-| 通常HTML・file://起動 | `browser-media-io-browser-0.3.0.zip` のJS。ビルド時は `dist/browser/` |
-| npm / バンドラー | `browser-media-io-0.3.0.tgz`。ES Modules・型定義を含む |
-| MP3出力だけを追加 | `browser-mp3-0.3.0.zip` の `browser-mp3.js` |
-| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.3.0.zip` |
+| 通常HTML・file://起動 | `browser-media-io-browser-0.4.0.zip` のJS。ビルド時は `dist/browser/` |
+| npm / バンドラー | `browser-media-io-0.4.0.tgz`。ES Modules・型定義を含む |
+| MP3出力だけを追加 | `browser-mp3-0.4.0.zip` の `browser-mp3.js` |
+| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.4.0.zip` |
 
 [公開済み配布物はGitHub Releases](https://github.com/cityedge/browser-media-i-o/releases)にあります。
-上表は0.3.0の生成物名です。未公開の版は下記コマンドで生成してください。
+上表は0.4.0の生成物名です。未公開の版は下記コマンドで生成してください。
+
+MP4映像はVBR・CBR・CQPとエンコーダー優先を指定でき、出力結果から実測平均映像ビットレートを取得できます。
+設定例と制約は[映像のレート制御](docs/API.md#映像のレート制御040以降)を参照してください。
 従来の[0.2.1](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.2.1)と
 [0.2.0](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.2.0)の配布物は各Releaseから取得できます。
 npmレジストリには公開していません。
@@ -84,6 +87,7 @@ npm run check:distribution # 公開ファイル・文書リンク・npm収録範
 ```
 
 テストにはPlaywrightとFFmpeg/ffprobeが必要です。[環境設定](docs/BUILDING.md) /
+[0.4.0の検証範囲](docs/VALIDATION_0.4.0.md) /
 [0.3.0の検証範囲](docs/VALIDATION_0.3.0.md) /
 [0.2.1のAPI検証](docs/VALIDATION_0.2.1.md) /
 [長尺・性能検証](docs/VALIDATION_0.2.md)。

@@ -246,6 +246,55 @@ const result = await renderMp4({
   アプリ独自のストリームの書き込みが終了しない場合などに、中止が一定時間以内で完了する保証はありません。
 - ビットレートは映像8Mbps、音声192kbpsが既定。`videoBitrate`、`audioBitrate` で変更します。
 
+### 映像のレート制御（0.4.0以降）
+
+`renderMp4`、`createMp4Writer`、`getCapabilities` で共通の設定を使用します。
+数値の単位はbit/sです。20 Mbpsは `20_000_000` と指定します。
+
+| 設定 | 内容 |
+|---|---|
+| `videoBitrateMode: 'variable'` | VBR（既定）。`videoBitrate` は目標値で、内容やエンコーダーにより実測は下回ることがあります |
+| `videoBitrateMode: 'constant'` | CBR。`videoBitrate` を使って一定のレートを要求します。厳密な値・最小レート・ファイル容量の保証ではありません |
+| `videoBitrateMode: 'quantizer'` | CQP。必須の `videoQuantizer`（整数0–51、小さいほど高画質）で制御。ビットレートと容量は内容によって変わります |
+| `videoHardwareAcceleration` | `'no-preference'`（既定）、`'prefer-hardware'`、`'prefer-software'`。ブラウザーへの優先ヒントであり、使用エンコーダーを保証しません |
+
+```ts
+const settings = {
+  width: 1920, height: 1080, fps: 30,
+  videoBitrate: 20_000_000,
+  videoBitrateMode: 'constant' as const,
+  videoHardwareAcceleration: 'prefer-software' as const,
+};
+if (!(await getCapabilities(settings)).h264Encode) {
+  // 別の方式・優先設定を利用者が選択できるようにする。
+  throw new Error('この出力設定は非対応です');
+}
+const result = await renderMp4({ ...settings, duration: 10, renderFrame: drawFrame });
+console.log(result.videoBitrate);          // 要求した20,000,000 bit/s
+console.log(result.averageVideoBitrate);   // 実測の平均映像bit/s
+
+// CQPではvideoBitrateを渡さず、量子化値を指定する。
+const cqp = await createMp4Writer({ width: 1920, height: 1080, fps: 30,
+  videoBitrateMode: 'quantizer', videoQuantizer: 23 });
+```
+
+CQPと `videoBitrate` の併用、VBR/CBRと `videoQuantizer` の併用、範囲外の値はINVALID_ARGUMENTです。
+非対応の設定はUNSUPPORTEDで拒否し、ライブラリはVBRなどへ自動変更しません。
+既存アプリは設定を省略すれば従来どおり8 MbpsのVBRになります。
+
+Mp4Resultの `videoBitrateMode`、`videoBitrate`、`videoQuantizer` は要求設定です。
+`videoBytes` は映像パケットの合計バイト数、`averageVideoBitrate` は `videoBytes * 8 / duration`。
+音声とMP4の管理情報を除く実測値で、Blob保存・ストリーム保存の両方で取得できます。
+ファイル全体の平均は `bytes * 8 / duration` で計算します。
+
+20 Mbpsがエンコーダーへ渡っても4 Mbpsになる場合、指定値だけでは不具合と判断できません。
+CBR、ソフトウェア優先、CQPの低い量子化値で比較し、実測値と画質を確認してください。
+静止画や動きの少ない映像は高い目標値でも少ないデータで符号化できることがあります。
+CBRは短時間の変動・平均の不足が実装によって残るため、厳密な20 MbpsをこのAPIだけで保証することはできません。
+WebCodecsの[レート制御仕様](https://w3c.github.io/webcodecs/#dom-videoencoderconfig-bitratemode)、
+[H.264量子化値](https://w3c.github.io/webcodecs/avc_codec_registration.html#dom-videoencoderencodeoptionsforavc-quantizer)、
+Mediabunnyの[Quality設定](https://mediabunny.dev/guide/media-sources#quantitative-quality)を参照してください。
+
 ## AACの明示的な拡張
 
 ```ts

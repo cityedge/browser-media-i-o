@@ -1,6 +1,7 @@
 export { MediaError, type MediaErrorCode } from './errors.js';
 export { frameTime, type FrameRate } from './time.js';
 export { getCapabilities, type CapabilityOptions } from './capabilities.js';
+export type { VideoEncodingOptions, VideoBitrateMode, VideoHardwareAcceleration } from './video-encoding.js';
 export { openMediaPublic as openMedia, openMediaPublic, probe, decodeAudio, type MediaInput, type MediaFrame,
   type OpenOptions, type ProbeOptions, type MediaInfo, type TrackInfo, type DurationInfo, type DecodeAudioOptions } from './input-core.js';
 export { createMp4Writer, renderMp4, type Mp4Writer,

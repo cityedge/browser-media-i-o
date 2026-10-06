@@ -51,7 +51,8 @@ npm run test:local
 npm run check:distribution
 ```
 
-npm testはWeb 59件・Framecraft 6件を実行し、Viteの起動・終了を自動管理します。
+npm testはWeb 68件・Framecraft 6件を実行し、Viteの起動・終了を自動管理します。
+VBR/CBR/CQPの対応確認、実際のエンコーダー設定、FFprobeによる映像パケットサイズの独立検査を含みます。
 test:localは実際の軽量ZIPを新しい日本語・空白パスへ展開し、サーバーなし・オフラインでfile://へ遷移します。
 ネイティブAACとWASM AACを分けて試験します。両経路を確認するためネイティブAAC対応のWindows Chrome/Edgeを使用してください。
 WASM経路はテスト内でAACの能力応答だけをfalseにして実行します。

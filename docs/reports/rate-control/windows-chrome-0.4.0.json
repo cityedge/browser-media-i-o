@@ -1,0 +1,480 @@
+{
+  "browser": "chrome",
+  "version": "154.0.8037.93",
+  "cases": [
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "variable",
+        "videoHardwareAcceleration": "no-preference",
+        "videoBitrate": 20000000
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 13483,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "variable",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 12501,
+        "averageVideoBitrate": 50004
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "variable",
+        "videoHardwareAcceleration": "no-preference",
+        "videoBitrate": 20000000
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 4889669,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "variable",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 4888687,
+        "averageVideoBitrate": 19554748
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "constant",
+        "videoHardwareAcceleration": "no-preference",
+        "videoBitrate": 20000000
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 12331,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 11349,
+        "averageVideoBitrate": 45396
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "constant",
+        "videoHardwareAcceleration": "no-preference",
+        "videoBitrate": 20000000
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 5060617,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 5059635,
+        "averageVideoBitrate": 20238540
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "quantizer",
+        "videoHardwareAcceleration": "no-preference",
+        "videoQuantizer": 23
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 8912,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "quantizer",
+        "videoBitrate": null,
+        "videoQuantizer": 23,
+        "videoBytes": 7930,
+        "averageVideoBitrate": 31720
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "quantizer",
+        "videoHardwareAcceleration": "no-preference",
+        "videoQuantizer": 23
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 16665038,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "quantizer",
+        "videoBitrate": null,
+        "videoQuantizer": 23,
+        "videoBytes": 16664056,
+        "averageVideoBitrate": 66656224
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "variable",
+        "videoHardwareAcceleration": "prefer-hardware",
+        "videoBitrate": 20000000
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 13483,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "variable",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 12501,
+        "averageVideoBitrate": 50004
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "variable",
+        "videoHardwareAcceleration": "prefer-hardware",
+        "videoBitrate": 20000000
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 4889669,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "variable",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 4888687,
+        "averageVideoBitrate": 19554748
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "constant",
+        "videoHardwareAcceleration": "prefer-hardware",
+        "videoBitrate": 20000000
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 12331,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 11349,
+        "averageVideoBitrate": 45396
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "constant",
+        "videoHardwareAcceleration": "prefer-hardware",
+        "videoBitrate": 20000000
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 5060617,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 5059635,
+        "averageVideoBitrate": 20238540
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "quantizer",
+        "videoHardwareAcceleration": "prefer-hardware",
+        "videoQuantizer": 23
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 8912,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "quantizer",
+        "videoBitrate": null,
+        "videoQuantizer": 23,
+        "videoBytes": 7930,
+        "averageVideoBitrate": 31720
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "quantizer",
+        "videoHardwareAcceleration": "prefer-hardware",
+        "videoQuantizer": 23
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 16665038,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "quantizer",
+        "videoBitrate": null,
+        "videoQuantizer": 23,
+        "videoBytes": 16664056,
+        "averageVideoBitrate": 66656224
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "variable",
+        "videoHardwareAcceleration": "prefer-software",
+        "videoBitrate": 20000000
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 37397,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "variable",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 36419,
+        "averageVideoBitrate": 145676
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "variable",
+        "videoHardwareAcceleration": "prefer-software",
+        "videoBitrate": 20000000
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 15967212,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "variable",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 15966222,
+        "averageVideoBitrate": 63864888
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "constant",
+        "videoHardwareAcceleration": "prefer-software",
+        "videoBitrate": 20000000
+      },
+      "scene": "simple",
+      "supported": true,
+      "result": {
+        "bytes": 37272,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 36294,
+        "averageVideoBitrate": 145176
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "constant",
+        "videoHardwareAcceleration": "prefer-software",
+        "videoBitrate": 20000000
+      },
+      "scene": "noise",
+      "supported": true,
+      "result": {
+        "bytes": 15966570,
+        "videoFrames": 60,
+        "audioSamples": 0,
+        "duration": 2,
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoCodec": "h264",
+        "audioCodec": null,
+        "videoBitrateMode": "constant",
+        "videoBitrate": 20000000,
+        "videoQuantizer": null,
+        "videoBytes": 15965580,
+        "averageVideoBitrate": 63862320
+      }
+    },
+    {
+      "config": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "videoBitrateMode": "quantizer",
+        "videoHardwareAcceleration": "prefer-software",
+        "videoQuantizer": 23
+      },
+      "supported": false,
+      "code": "UNSUPPORTED"
+    }
+  ],
+  "errors": [],
+  "network": [],
+  "ui": {
+    "cqpSupported": true,
+    "languages": [
+      "ja",
+      "en"
+    ],
+    "viewports": [
+      "1200x1000",
+      "390x844"
+    ],
+    "status": "passed"
+  }
+}

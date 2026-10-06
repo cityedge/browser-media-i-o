@@ -16,6 +16,11 @@
       cancelled: '中止しました。再実行できます。', failed: '処理できませんでした。',
       tooLong: 'このサンプルの入力は60秒以内です。', noTrack: '読み取り可能な映像・音声がありません。',
       unavailable: 'H.264出力に対応したデスクトップChrome / Edgeで開いてください。', pcmLimit: '音声PCMが128 MiBを超えています。',
+      rateMode: '映像レート制御', bitrate: '目標映像ビットレート（Mbps）', quantizer: '量子化値（0–51、小さいほど高画質）',
+      encoder: 'エンコーダー優先', automatic: '自動', hardware: 'ハードウェア優先', software: 'ソフトウェア優先',
+      rateHelp: 'VBR/CBRは目標値です。CQPはビットレートを指定せず画質を制御します。利用可能な方式は環境によって異なります。',
+      invalidSettings: '映像出力の設定値を確認してください。', unsupportedSettings: 'この映像出力設定は非対応です。レート制御またはエンコーダー優先を変更してください。',
+      actualBitrate: '実測平均映像ビットレート', targetBitrate: '目標',
     },
     en: {
       language: 'Language', title: 'Open. Convert. Save.',
@@ -29,6 +34,11 @@
       cancelled: 'Cancelled. You can try again.', failed: 'The operation failed.',
       tooLong: 'This sample accepts inputs up to 60 seconds.', noTrack: 'No decodable video or audio was found.',
       unavailable: 'Open in desktop Chrome / Edge with H.264 encoding support.', pcmLimit: 'Decoded audio exceeds 128 MiB.',
+      rateMode: 'Video rate control', bitrate: 'Target video bitrate (Mbps)', quantizer: 'Quantizer (0–51, lower means higher quality)',
+      encoder: 'Encoder preference', automatic: 'Automatic', hardware: 'Prefer hardware', software: 'Prefer software',
+      rateHelp: 'VBR/CBR specify a target. CQP controls quality without specifying a bitrate. Available modes depend on your environment.',
+      invalidSettings: 'Check the video output settings.', unsupportedSettings: 'These video settings are unsupported. Change the rate control or encoder preference.',
+      actualBitrate: 'Measured average video bitrate', targetBitrate: 'Target',
     },
   };
   let lang = 'ja', status = 'idle', busy = false, file, info, capabilities, controller;
@@ -36,6 +46,15 @@
   const urls = new Map(), limit = 128 * 1024 * 1024;
   const t = key => words[lang][key];
   const tracks = () => ({ video: info?.tracks.find(t => t.video), audio: info?.tracks.find(t => t.audio) });
+  function videoOptions() {
+    const videoBitrateMode = $('video-mode').value;
+    const field = $(videoBitrateMode === 'quantizer' ? 'video-quantizer' : 'video-bitrate');
+    if (!Number.isFinite(field.valueAsNumber) || (videoBitrateMode === 'quantizer'
+      ? !Number.isInteger(field.valueAsNumber) || field.valueAsNumber < 0 || field.valueAsNumber > 51
+      : field.valueAsNumber < 0.001)) fail('invalidSettings');
+    return { videoBitrateMode, videoHardwareAcceleration: $('video-hardware').value,
+      ...(videoBitrateMode === 'quantizer' ? { videoQuantizer: field.valueAsNumber } : { videoBitrate: Math.round(field.valueAsNumber * 1_000_000) }) };
+  }
   function refresh() {
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(node => node.textContent = t(node.dataset.i18n));
@@ -43,10 +62,14 @@
     $('error').hidden = !error;
     $('error').textContent = error ? `${t('failed')} ${error.key ? t(error.key) : error.message}` : '';
     $('source').disabled = busy;
+    $('video-mode').disabled = busy; $('video-hardware').disabled = busy;
+    $('video-bitrate').disabled = busy || $('video-mode').value === 'quantizer';
+    $('video-quantizer').disabled = busy || $('video-mode').value !== 'quantizer';
     $('cancel').hidden = !busy;
     $('cancel').disabled = !!controller?.signal.aborted;
     $('export-mp4').disabled = busy || !info || !capabilities?.h264Encode;
     $('export-mp3').disabled = busy || !tracks().audio?.canDecode;
+    $('output-info').textContent = output?.format === 'mp4' ? `${{ variable: 'VBR', constant: 'CBR', quantizer: 'CQP' }[output.videoBitrateMode]} · ${t('actualBitrate')}: ${(output.averageVideoBitrate / 1_000_000).toFixed(3)} Mbps · ${output.videoBitrate === null ? 'QP ' + output.videoQuantizer : t('targetBitrate') + ': ' + output.videoBitrate / 1_000_000 + ' Mbps'}` : '';
     $('diagnostics').textContent = JSON.stringify({ protocol: location.protocol, secureContext: isSecureContext,
       browser: navigator.userAgent, capabilities, input: info, aacBackend: backend, output }, null, 2);
   }
@@ -88,6 +111,7 @@
     finally { busy = false; controller = undefined; $('progress').hidden = true; refresh(); }
   }
   $('language').addEventListener('change', () => { lang = $('language').value; refresh(); });
+  $('video-mode').addEventListener('change', refresh);
   $('cancel').addEventListener('click', () => { controller?.abort(); refresh(); });
   $('source').addEventListener('change', () => {
     const selected = $('source').files[0];
@@ -120,7 +144,9 @@
       // Invalidate this format immediately so a failed retry cannot expose an older result.
       if (urls.has(format)) URL.revokeObjectURL(urls.get(format));
       urls.delete(format); $('save-' + format).hidden = true; $('save-' + format).removeAttribute('href');
+      output = undefined; refresh();
       const { video, audio } = tracks();
+      const encoding = format === 'mp4' ? videoOptions() : undefined;
       const pcm = await decodeSound(video, audio, signal);
       if (pcm && pcm.duration > 60) fail('tooLong');
       let blob, input;
@@ -133,10 +159,11 @@
           const width = video ? Math.max(2, Math.floor(video.video.width * scale / 2) * 2) : 640;
           const height = video ? Math.max(2, Math.floor(video.video.height * scale / 2) * 2) : 360;
           const duration = Math.max(video?.duration.seconds ?? 0, pcm?.duration ?? 0);
+          if (!(await api.getCapabilities({ width, height, fps: 30, ...encoding })).h264Encode) fail('unsupportedSettings');
           if (pcm) backend = await api.enableAacFallback({ width, height, sampleRate: pcm.sampleRate, channels: pcm.numberOfChannels });
           else backend = 'none';
           if (video) input = await api.openMedia(file, { signal });
-          const result = await api.renderMp4({ width, height, fps: 30, duration, audio: pcm, signal,
+          const result = await api.renderMp4({ width, height, fps: 30, duration, audio: pcm, signal, ...encoding,
             target: { kind: 'blob', maxBytes: limit },
             onProgress: event => $('progress').value = event.fraction ?? 0,
             renderFrame: async (ctx, time) => {
