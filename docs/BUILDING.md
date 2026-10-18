@@ -17,6 +17,8 @@ npm run typecheck
 | dist/standalone/ | MP3専用の通常script版とサンプル |
 
 依存のインストールはネット接続を使用します。ビルドにはFFmpegやブラウザは不要です。
+MP3対応ソースの展開にtarを使用します（Windows標準のtar.exeで動作）。
+VBR/ABRを含むMP3はJavaScriptで構成し、ビルド時にもWASMコンパイラーは不要です。
 利用アプリのエンドユーザーはビルドを行う必要がありません。
 
 ## 配布物

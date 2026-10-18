@@ -7,7 +7,7 @@ WebアプリにMP4・MP3・WAVの読み取り、映像フレーム／PCMの取�
 
 ## ローカルサーバーなしで使う
 
-0.3.0の通常script版は、**このライブラリを使うアプリ自身のindex.htmlを直接開く**構成に対応します。
+0.3.0以降の通常script版は、**このライブラリを使うアプリ自身のindex.htmlを直接開く**構成に対応します。
 利用アプリのフォルダーにJSを置き、通常のscriptタグで読み込みます。
 
 ```html
@@ -27,16 +27,17 @@ AACのWASMとMP3 Workerも同梱済みです。利用時にNode.js・ローカ�
 
 | 導入方法 | 利用するもの |
 |---|---|
-| 通常HTML・file://起動 | `browser-media-io-browser-0.4.0.zip` のJS。ビルド時は `dist/browser/` |
-| npm / バンドラー | `browser-media-io-0.4.0.tgz`。ES Modules・型定義を含む |
-| MP3出力だけを追加 | `browser-mp3-0.4.0.zip` の `browser-mp3.js` |
-| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.4.0.zip` |
+| 通常HTML・file://起動 | `browser-media-io-browser-0.5.0.zip` のJS。ビルド時は `dist/browser/` |
+| npm / バンドラー | `browser-media-io-0.5.0.tgz`。ES Modules・型定義を含む |
+| MP3出力だけを追加 | `browser-mp3-0.5.0.zip` の `browser-mp3.js` |
+| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.5.0.zip` |
 
 [公開済み配布物はGitHub Releases](https://github.com/cityedge/browser-media-i-o/releases)にあります。
-上表は0.4.0の生成物名です。未公開の版は下記コマンドで生成してください。
+上表は0.5.0の配布物名です。ソースからの生成には下記コマンドを使用してください。
 
 MP4映像はVBR・CBR・CQPとエンコーダー優先を指定でき、出力結果から実測平均映像ビットレートを取得できます。
 設定例と制約は[映像のレート制御](docs/API.md#映像のレート制御040以降)を参照してください。
+0.5.0から[MP3のCBR・VBR・ABR出力](docs/MP3.md)にも対応します。MP3用WASMの追加はありません。
 従来の[0.2.1](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.2.1)と
 [0.2.0](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.2.0)の配布物は各Releaseから取得できます。
 npmレジストリには公開していません。
@@ -81,12 +82,13 @@ npm run package:release   # npm・MP3・対応ソースを含むRelease用ファ
 - [Framecraft](docs/FRAMECRAFT.md)：画像・動画・音声・字幕を組み合わせるアプリ実装例。Viteで動作します。
 
 ```sh
-npm test                 # 型検査・既存の入出力59件・アプリ6件
+npm test                 # 型検査・入出力90件・アプリ6件
 npm run test:local       # 実際の軽量ZIPを展開し、file://・オフラインで検証
 npm run check:distribution # 公開ファイル・文書リンク・npm収録範囲を検査
 ```
 
 テストにはPlaywrightとFFmpeg/ffprobeが必要です。[環境設定](docs/BUILDING.md) /
+[0.5.0の検証範囲](docs/VALIDATION_0.5.0.md) /
 [0.4.0の検証範囲](docs/VALIDATION_0.4.0.md) /
 [0.3.0の検証範囲](docs/VALIDATION_0.3.0.md) /
 [0.2.1のAPI検証](docs/VALIDATION_0.2.1.md) /

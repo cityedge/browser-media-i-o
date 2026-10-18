@@ -26,11 +26,17 @@ include its inline WASM and share one bundled Mediabunny instance; call enableAa
 Authors: Alex Zhukov, the LAME project and fork contributors.
 [Package](https://www.npmjs.com/package/@breezystack/lamejs/v/1.2.7) /
 [exact upstream source](https://github.com/shijinyu/lamejs/tree/1fb0ef5fa177413107e2e107d054a9b994e3f79c).
-Unmodified encoder bundled into the MP3 Blob worker. The npm core MP4 entry does not include it.
+Modified encoder built from its pinned corresponding JavaScript source and bundled into the MP3 Blob worker.
+Modifications (2026-10-18): JavaScript ports of the upstream Java VBROldIterationLoop and ABRIterationLoop,
+fixes for dormant VBR/ABR instance calls and integer conversions, and encoder option/error handling.
+The modifications are in third_party/lamejs/extensions/ and scripts/prepare-lamejs.mjs and retain LGPL-3.0 terms
+where derived from LAME/lamejs. The VBR algorithm is RH; the unimplemented MTRH path is not exposed.
+The npm core MP4 entry does not include it.
 The classic all-in-one bundles and the dedicated BrowserMp3 script include it.
 
 In the repository and matching source ZIP, third_party/lamejs/source.tar.gz contains corresponding
-upstream source/build files. COPYING and COPYING.LESSER contain GPLv3 and LGPLv3.
+upstream source/build files. The matching source ZIP also includes the extensions and patch/build script above.
+COPYING and COPYING.LESSER contain GPLv3 and LGPLv3.
 The standalone MP3 ZIP includes these license texts; the source archive is in the matching source ZIP.
 
 ## Source availability and replacement

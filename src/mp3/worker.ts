@@ -1,4 +1,4 @@
-import { Mp3Encoder } from '@breezystack/lamejs';
+import { Mp3Encoder } from './encoder.js';
 
 // This module is bundled separately and runs only inside a dedicated Worker.
 const scope = globalThis as unknown as {
@@ -9,11 +9,12 @@ let encoder: Mp3Encoder | undefined;
 scope.onmessage = ({ data }) => {
   try {
     const chunks: Uint8Array<ArrayBuffer>[] = [];
-    const append = (bytes: Uint8Array) => {
+    const append = (bytes: Uint8Array | Int8Array) => {
       if (bytes.length) chunks.push(new Uint8Array(bytes));
     };
     if (data.type === 'init') {
-      encoder = new Mp3Encoder(data.channels, data.sampleRate, data.bitrate / 1000);
+      encoder = new Mp3Encoder(data.channels, data.sampleRate, data.bitrate / 1000,
+        { mode: data.mode, vbrQuality: data.vbrQuality });
     } else if (data.type === 'encode') {
       if (!encoder) throw new Error('Encoder is not initialized.');
       const channels = (data.channels as Float32Array[]).map(channel => {

@@ -1,9 +1,35 @@
 import { test, expect, type Page } from '@playwright/test';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { ffmpeg, fixtureDir, truth } from '../../scripts/generate-fixtures.mjs';
 import type {} from './harness/mp3';
+import { build } from 'esbuild';
+import { pathToFileURL } from 'node:url';
+
+function frameRates(bytes: Buffer) {
+  const counts = new Map<number, number>();
+  let at = 0;
+  while (at < bytes.length) {
+    expect(bytes[at]).toBe(255);
+    expect(bytes[at + 1] & 0xe6).toBe(0xe2); // sync and Layer III
+    const version = (bytes[at + 1] >> 3) & 3;
+    expect(version).not.toBe(1);
+    const high = version === 3;
+    const table = high ? [0,32,40,48,56,64,80,96,112,128,160,192,224,256,320]
+      : [0,8,16,24,32,40,48,56,64,80,96,112,128,144,160];
+    const bitrate = table[bytes[at + 2] >> 4];
+    const sr = [44100,48000,32000][(bytes[at + 2] >> 2) & 3] / (high ? 1 : version === 2 ? 2 : 4);
+    expect(bitrate).toBeGreaterThan(0); expect(sr).toBeGreaterThan(0);
+    const side = high ? ((bytes[at + 3] >> 6) === 3 ? 17 : 32) : ((bytes[at + 3] >> 6) === 3 ? 9 : 17);
+    if (bytes.toString('ascii', at + 4 + side, at + 8 + side) !== 'Xing') {
+      counts.set(bitrate, (counts.get(bitrate) ?? 0) + 1);
+    }
+    at += Math.floor((high ? 144000 : 72000) * bitrate / sr) + ((bytes[at + 2] >> 1) & 1);
+  }
+  expect(at).toBe(bytes.length);
+  return Object.fromEntries(counts);
+}
 
 function inspect(file: string) {
   return JSON.parse(execFileSync(process.env.FFPROBE_PATH || 'ffprobe', [
@@ -52,7 +78,10 @@ async function start(page: Page) {
       }
       terminate() { if (this.alive) { counters.active--; this.alive = false; } super.terminate(); }
     };
-    for (const key of ['MediaRecorder', 'AudioEncoder', 'VideoEncoder', 'AudioContext', 'OfflineAudioContext']) {
+    const createUrl = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (blob: Blob | MediaSource) => createUrl(blob instanceof Blob && blob.type === 'text/javascript'
+      ? new Blob(['globalThis.WebAssembly = undefined;\n', blob], { type: blob.type }) : blob);
+    for (const key of ['WebAssembly', 'MediaRecorder', 'AudioEncoder', 'VideoEncoder', 'AudioContext', 'OfflineAudioContext']) {
       Object.defineProperty(window, key, { value: undefined, configurable: true });
     }
     HTMLMediaElement.prototype.play = () => { throw new Error('MP3 export must not play media.'); };
@@ -97,6 +126,144 @@ test('MP3: existing WAV becomes an offline stereo MP3 without playback or WebCod
     for (let i = 0; i < pulses[c].length; i++) expect(Math.abs(pulses[c][i] - truth.pulses[c][i])).toBeLessThanOrEqual(.03);
   }
   await testInfo.attach('verification.json', { body: JSON.stringify({ browser: browser.version(), ...result, duration: checked.duration, sampleCount: checked.sampleCount, pulses }), contentType: 'application/json' });
+});
+
+test('MP3: CBR is byte-identical to the original encoder at every supported input sample rate', async ({ page }) => {
+  await start(page);
+  const legacy = await build({ entryPoints: ['node_modules/@breezystack/lamejs/dist/lamejs.js'], bundle: true,
+    write: false, format: 'iife', globalName: 'LegacyMp3', platform: 'browser' });
+  await page.addScriptTag({ content: legacy.outputFiles[0].text });
+  const results = await page.evaluate(async () => {
+    const outcomes = [];
+    for (const sampleRate of [8000,11025,12000,16000,22050,24000,32000,44100,48000]) for (const channels of [1,2]) {
+      const floats = Array.from({length:channels}, (_,c) => Float32Array.from({length:2304+317},(_,i) => .5*Math.sin(i*(c+1)*.2)));
+      const ints = floats.map(a => Int16Array.from(a,x=>Math.round(x*(x<0?32768:32767))));
+      const bitrate = sampleRate >= 32000 ? 192 : 128;
+      const encoder = new (window as any).LegacyMp3.Mp3Encoder(channels,sampleRate,bitrate);
+      const parts: Uint8Array[] = [];
+      for(let i=0;i<ints[0].length;i+=1152) parts.push(new Uint8Array(encoder.encodeBuffer(ints[0].subarray(i,i+1152),ints[1]?.subarray(i,i+1152))));
+      parts.push(new Uint8Array(encoder.flush()));
+      const expected = new Uint8Array(await new Blob(parts as BlobPart[]).arrayBuffer());
+      const blob = await window.mp3Harness.encodeMp3({sampleRate,numberOfChannels:channels,length:floats[0].length,getChannelData:c=>floats[c]});
+      const actual = new Uint8Array(await blob.arrayBuffer());
+      outcomes.push({sampleRate,channels,equal:actual.length===expected.length&&actual.every((x,i)=>x===expected[i])});
+    }
+    return outcomes;
+  });
+  expect(results.filter(x=>!x.equal)).toEqual([]);
+});
+
+for (const mode of ['vbr','abr'] as const) {
+  for (const sampleRate of [8000,11025,12000,16000,22050,24000,32000,44100,48000]) {
+    test(`MP3: ${mode} at ${sampleRate} Hz is valid and preserves waveform`, async ({ page }, testInfo) => {
+      await start(page);
+      const wav = testInfo.outputPath('source.wav');
+      ffmpeg(['-i',path.join(fixtureDir,'reference.wav'),'-t','1.5','-ar',String(sampleRate),'-ac','1',wav]);
+      const bytes = [...await readFile(wav)];
+      const [download] = await Promise.all([page.waitForEvent('download'),page.evaluate(async ({bytes,mode,sampleRate})=>{
+        const options = mode==='vbr' ? {mode,vbrQuality:2} : {mode,abrBitrate:sampleRate<16000?64000:128000};
+        const blob=await window.mp3Harness.wavToMp3(new Uint8Array(bytes).buffer,options);
+        window.mp3Harness.save(blob);
+      },{bytes,mode,sampleRate})]);
+      const output=testInfo.outputPath(mode+'.mp3'); await download.saveAs(output);
+      const {pcm}=verify(output,sampleRate,1,1.5);
+      matchMonoPcm(pcm,wav);
+      frameRates(await readFile(output));
+      expect((await page.evaluate(()=>window.mp3Workers)).active).toBe(0);
+    });
+  }
+}
+
+test('MP3: file launch offline VBR quality and ABR target control real frame allocation', async ({ page, context },testInfo)=>{
+  await start(page);
+  await page.goto(pathToFileURL(path.resolve('dist/standalone/index.html')).href);
+  await context.setOffline(true);
+  const results=await page.evaluate(async()=>{
+    const sampleRate=44100,length=sampleRate*4+317;
+    const pcm=[new Float32Array(length),new Float32Array(length)];
+    let seed=123;
+    for(let i=0;i<length;i++) {
+      seed=(Math.imul(seed,1664525)+1013904223)>>>0;
+      const t=i/sampleRate,noise=(seed/4294967296*2-1)*.25;
+      for(let ch=0;ch<2;ch++) pcm[ch][i]=t<1?0:t<2?.4*Math.sin(2*Math.PI*(440+ch*220)*t):noise;
+    }
+    const audio={sampleRate,numberOfChannels:2,length,getChannelData:(c:number)=>pcm[c]};
+    const outputs=[];
+    for(const options of [{mode:'vbr',vbrQuality:0},{mode:'vbr',vbrQuality:9},{mode:'abr',abrBitrate:96000},{mode:'abr',abrBitrate:192000}]) {
+      const progress:number[]=[];
+      const blob=await (window as any).BrowserMp3.encodeMp3(audio,{...options,onProgress:(x:number)=>progress.push(x)});
+      outputs.push({options,bytes:[...new Uint8Array(await blob.arrayBuffer())],progress});
+    }
+    return {outputs,workers:window.mp3Workers};
+  });
+  for(let i=0;i<results.outputs.length;i++) {
+    const result=results.outputs[i], bytes=Buffer.from(result.bytes);
+    const output=testInfo.outputPath(`setting-${i}.mp3`); await writeFile(output,bytes);
+    verify(output,44100,2,(44100*4+317)/44100);
+    const rates=frameRates(bytes);
+    expect(Object.keys(rates).length).toBeGreaterThan(1);
+    const xing=36;
+    expect(bytes.toString('ascii',xing,xing+4)).toBe('Xing');
+    expect(bytes.readUInt32BE(xing+8)).toBe(Object.values(rates).reduce((a,b)=>a+b,0));
+    expect(bytes.readUInt32BE(xing+12)).toBe(bytes.length);
+    const toc=[...bytes.subarray(xing+16,xing+116)];
+    expect(toc[0]).toBe(0); expect(toc).toEqual([...toc].sort((a,b)=>a-b));
+    expect(result.progress[0]).toBe(0); expect(result.progress.at(-1)).toBe(1);
+    expect(result.progress).toEqual([...result.progress].sort((a,b)=>a-b));
+  }
+  expect(results.outputs[0].bytes.length).toBeGreaterThan(results.outputs[1].bytes.length);
+  expect(results.outputs[3].bytes.length).toBeGreaterThan(results.outputs[2].bytes.length);
+  expect(results.workers).toEqual({active:0,started:4});
+});
+
+test('MP3: sustained stereo VBR preserves channels and final samples across many worker blocks',async({page},testInfo)=>{
+  await start(page);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.evaluate(async()=>{
+    const sampleRate=48000,length=sampleRate*30+317;
+    const pcm=Array.from({length:2},(_,ch)=>Float32Array.from({length},(_,i)=>.45*Math.sin(2*Math.PI*(ch?1733:431)*i/sampleRate)));
+    const blob=await window.mp3Harness.encodeMp3({sampleRate,length,numberOfChannels:2,getChannelData:c=>pcm[c]}, {mode:'vbr',vbrQuality:2});
+    window.mp3Harness.save(blob);
+  })]);
+  const file=testInfo.outputPath('long.mp3'); await download.saveAs(file);
+  const {pcm,sampleCount}=verify(file,48000,2,(48000*30+317)/48000);
+  // A narrow-band projection near the end checks channel order, frequency and tail retention.
+  for(let ch=0;ch<2;ch++) {
+    const frequency=ch?1733:431, from=Math.floor(sampleCount-48000-2304);
+    let real=0,imag=0,finite=true;
+    for(let j=0;j<48000;j++) {
+      const value=pcm.readFloatLE(((from+j)*2+ch)*4),phase=2*Math.PI*frequency*j/48000;
+      finite &&= Number.isFinite(value);
+      real+=value*Math.cos(phase);imag+=value*Math.sin(phase);
+    }
+    expect(finite).toBe(true); expect(2*Math.hypot(real,imag)/48000).toBeGreaterThan(.35);
+  }
+  expect((await page.evaluate(()=>window.mp3Workers)).active).toBe(0);
+});
+
+test('MP3: VBR/ABR option errors, short silence, limits and cancellation',async({page})=>{
+  await start(page);
+  const results=await page.evaluate(async()=>{
+    const samples=new Float32Array(48000*4),audio={sampleRate:48000,numberOfChannels:1,length:samples.length,getChannelData:()=>samples};
+    const encode=window.mp3Harness.encodeMp3;
+    const invalid=[{mode:'other'},{mode:'vbr',bitrate:128000},{mode:'cbr',vbrQuality:2},{mode:'vbr',vbrQuality:-1},{mode:'vbr',vbrQuality:10},{mode:'vbr',vbrQuality:2.5},{mode:'vbr',vbrQuality:NaN},{mode:'abr'},{mode:'abr',abrBitrate:Infinity},{mode:'abr',abrBitrate:137123},{mode:'abr',abrBitrate:8000},{mode:'vbr',abrBitrate:128000},{mode:'abr',vbrQuality:4},{mode:'cbr',abrBitrate:128000}];
+    const errors=[];
+    for(const options of invalid)errors.push(await encode(audio,options as any).then(()=>'unexpected',e=>e.code));
+    const modes=[];
+    for(const mode of ['vbr','abr'] as const){
+      const options=mode==='vbr'?{mode}:{mode,abrBitrate:137000};
+      const controller=new AbortController();
+      const cancelled=await encode(audio,{...options,signal:controller.signal,onProgress:x=>{if(x>0)controller.abort();}}).then(()=>'unexpected',e=>e.code);
+      const limited=await encode(audio,{...options,maxOutputBytes:1}).then(()=>'unexpected',e=>e.code);
+      const nonfinite=await encode({...audio,getChannelData:()=>samples.map(()=>NaN)},options).then(()=>'unexpected',e=>e.code);
+      const blob=await encode({...audio,length:1,getChannelData:()=>new Float32Array(1)},options);
+      const tagLimit=await encode({...audio,length:1,getChannelData:()=>new Float32Array(1)},{...options,maxOutputBytes:blob.size-1}).then(()=>'unexpected',e=>e.code);
+      modes.push({cancelled,limited,nonfinite,tagLimit,shortSize:blob.size});
+    }
+    return {errors,modes,workers:window.mp3Workers};
+  });
+  expect(results.errors.every(x=>x==='INVALID_ARGUMENT')).toBe(true);
+  for(const mode of results.modes){expect(mode).toMatchObject({cancelled:'ABORTED',limited:'RESOURCE_LIMIT',nonfinite:'INVALID_ARGUMENT',tagLimit:'RESOURCE_LIMIT'});expect(mode.shortSize).toBeGreaterThan(0);}
+  expect(results.workers.active).toBe(0);
 });
 
 test('MP3: AudioBuffer input preserves PCM and flushes a partial final frame', async ({ page }, testInfo) => {

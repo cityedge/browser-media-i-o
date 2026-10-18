@@ -5,7 +5,7 @@
 
 ## 配置するファイル
 
-`browser-media-io-browser-0.4.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
+`browser-media-io-browser-0.5.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
 再配布時は通知・ライセンス・対応ソースの案内も保持してください。
 
 | ファイル | グローバル名 | 入力終了の契約 |
@@ -99,7 +99,7 @@ npm ci
 npm run package:browser
 ```
 
-通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.4.0.zip`。
+通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.5.0.zip`。
 対応ソースZIPは `npm run package:sources` で別途生成します。
 利用者のPCにはNode.js・サーバー・ネット接続は不要です。
 

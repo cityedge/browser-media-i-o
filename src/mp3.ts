@@ -1,6 +1,7 @@
 import { abortable, checkAbort, fail, MediaError, mediaError, positive } from './errors.js';
 import { mp3WorkerSource } from './mp3-worker-source.js';
 import { readWav, type PcmSource } from './mp3/wav.js';
+import { xingHeader } from './mp3/xing.js';
 
 export { MediaError } from './errors.js';
 
@@ -13,8 +14,14 @@ export interface Mp3Audio {
 }
 
 export interface Mp3Options {
+  /** Default: cbr. VBR uses LAME's older RH algorithm in JavaScript (not WASM). */
+  mode?: 'cbr' | 'vbr' | 'abr';
   /** Bits per second. Default: 192000 for >=32 kHz, 128000 for lower rates. CBR. */
   bitrate?: number;
+  /** VBR quality, integer 0 (highest) to 9 (lowest). Default: 4. VBR only. */
+  vbrQuality?: number;
+  /** ABR target in bits per second, whole kbps. Required in ABR mode. Not a size guarantee. */
+  abrBitrate?: number;
   signal?: AbortSignal;
   /** Monotonic fraction, from 0 to 1. A value of 1 means the MP3 is complete. */
   onProgress?: (fraction: number) => void;
@@ -63,10 +70,25 @@ async function encode(source: PcmSource, options: Mp3Options): Promise<Blob> {
     fail('UNSUPPORTED', 'MP3 input sample rate must be 8, 11.025, 12, 16, 22.05, 24, 32, 44.1 or 48 kHz.');
   }
   const highRate = source.sampleRate >= 32000;
-  const bitrate = options.bitrate ?? (highRate ? 192000 : 128000);
+  const mode = options.mode ?? 'cbr';
+  if (!['cbr', 'vbr', 'abr'].includes(mode)) fail('INVALID_ARGUMENT', 'Unknown MP3 mode.');
+  if (mode !== 'cbr' && options.bitrate !== undefined) fail('INVALID_ARGUMENT', 'bitrate is only valid for CBR; use vbrQuality or abrBitrate.');
+  if (mode !== 'vbr' && options.vbrQuality !== undefined) fail('INVALID_ARGUMENT', 'vbrQuality is only valid for VBR.');
+  if (mode !== 'abr' && options.abrBitrate !== undefined) fail('INVALID_ARGUMENT', 'abrBitrate is only valid for ABR.');
+  const vbrQuality = mode === 'vbr' ? options.vbrQuality ?? 4 : undefined;
+  if (vbrQuality !== undefined && (!Number.isInteger(vbrQuality) || vbrQuality < 0 || vbrQuality > 9)) {
+    fail('INVALID_ARGUMENT', 'vbrQuality must be an integer from 0 to 9.');
+  }
+  const bitrate = mode === 'abr' ? options.abrBitrate! : options.bitrate ?? (highRate ? 192000 : 128000);
   const allowed = highRate ? [32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320]
     : [8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
-  if (!allowed.includes(bitrate / 1000)) fail('INVALID_ARGUMENT', `Unsupported MP3 bitrate for this sample rate: ${bitrate}.`);
+  if (mode === 'cbr' && !allowed.includes(bitrate / 1000)) fail('INVALID_ARGUMENT', `Unsupported MP3 bitrate for this sample rate: ${bitrate}.`);
+  if (mode === 'abr') {
+    const min = highRate ? 32000 : 8000, max = highRate ? 320000 : source.sampleRate < 16000 ? 64000 : 160000;
+    if (!Number.isInteger(bitrate / 1000) || bitrate < min || bitrate > max) {
+      fail('INVALID_ARGUMENT', `abrBitrate must be whole kbps between ${min} and ${max} bit/s for this sample rate.`);
+    }
+  }
   const limit = options.maxOutputBytes ?? 256 * 1024 * 1024;
   positive(limit, 'maxOutputBytes', true);
   if (onProgress !== undefined && typeof onProgress !== 'function') fail('INVALID_ARGUMENT', 'onProgress must be a function.');
@@ -112,7 +134,7 @@ async function encode(source: PcmSource, options: Mp3Options): Promise<Blob> {
       }
     };
     onProgress?.(0);
-    await request({ type: 'init', sampleRate: source.sampleRate, channels: source.channels, bitrate });
+    await request({ type: 'init', sampleRate: source.sampleRate, channels: source.channels, bitrate, mode, vbrQuality });
     // Bound transfer memory; only one block is in flight and the application keeps its PCM.
     const blockSize = 1152 * 32;
     for (let offset = 0; offset < source.length; offset += blockSize) {
@@ -125,6 +147,11 @@ async function encode(source: PcmSource, options: Mp3Options): Promise<Blob> {
     append(await request({ type: 'finish' }));
     checkAbort(signal);
     if (!size) fail('ENCODE_FAILED', 'MP3 encoder returned no data.');
+    if (mode !== 'cbr') {
+      const tag = await xingHeader(parts, size, signal);
+      if (size + tag.length > limit) fail('RESOURCE_LIMIT', 'MP3 exceeds maxOutputBytes including Xing metadata.');
+      parts.unshift(tag);
+    }
     const blob = new Blob(parts, { type: 'audio/mpeg' });
     onProgress?.(1);
     checkAbort(signal);
