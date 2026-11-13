@@ -1,4 +1,8 @@
-# H.264映像コピー＋加工済みPCM（0.6.0）
+# H.264映像コピー＋加工済みPCM（0.7.0）
+
+SPSの`gaps_in_frame_num_value_allowed_flag`のみで拒否せず、実際のフレーム番号の連続性を確認します。
+既定の通常モードでは実際の不連続や、MMCOによる番号リセットなど追加の解釈が必要な構造は引き続き拒否します。
+既定の厳格検査を通る範囲の拡充であり、検査を自動的に省略する機能ではありません。
 
 単一MP4の保持区間を元の順序で連結し、H.264映像を再圧縮せずに出力します。
 アプリで加工したplanar Float32 PCMをAACにして組み合わせることもできます。
@@ -47,17 +51,18 @@ AAC事前確認の`audioBitrate`と出力の`audio.bitrate`は同じ値にしま
 
 ## inspectと安全な境界
 
-`openVideoCopy(file, {videoTrackId?,signal?})`はBlob/Fileを開きます。ID省略時は先頭の映像トラックです。
+`openVideoCopy(file, {videoTrackId?,signal?,validation?})`はBlob/Fileを開きます。ID省略時は先頭の映像トラックです。
+`validation`は`'strict'`（既定）または`'container'`。セッションを開いた後の変更はできません。
 `inspect()`は全圧縮パケットを順に読み、必要なヘッダーと時刻を検査します。映像の全デコードはしません。
 圧縮データは保持せず、パケット索引だけを残します。結果はキャッシュされ、変更できません。
 
 結果にはトラックID、元の開始・終了時刻、時間単位、パケット数、寸法、回転、SAR、色、変換行列、
 キーフレーム間隔の最小／最大／平均、`boundaries`が含まれます。
-各境界は`{id,time,tick,kind:'idr'|'eof'}`です。EOFは終了専用です。
+各境界は`{id,time,tick,kind:'idr'|'sync'|'eof'}`です。通常モードは`idr`、強行モードは`sync`。EOFは終了専用です。
 `findBoundaries(time)`で直前／直後の境界を取得できます。範囲外は該当側がnullです。
-非対応の場合は`VideoCopyError`を投げます。未検査の位置を安全とする部分結果は返しません。
+非対応の場合は`VideoCopyError`を投げます。強行モードの`sync`は独立復号を検証済みのIDRではありません。
 
-安全な単位は、確認済みIDRから次のIDR直前、またはEOFまでです。
+以下は既定の通常モードの検査です。安全な単位は、確認済みIDRから次のIDR直前、またはEOFまでです。
 同期サンプルフラグと実際のIDR、全スライスの設定、復号順序、各GOPの表示時刻範囲、時間の連続性を照合します。
 IDRで参照画像がリセットされる構造に限り、区間前後の参照が欠けない単位でコピーします。
 任意の破損ビットストリームを完全に復号・検証する機能ではありません。
@@ -70,10 +75,73 @@ Open GOP、同期フラグ不整合、構成変更、複数sample description、
 末尾の最終画像の表示時間だけを短縮するeditは保持します。
 未知の表示構造は拒否し、黙って再圧縮へ切り替えません。
 
+## 警告があっても出力する設定
+
+```js
+const copy = await BrowserMediaIO.openVideoCopy(file, { validation: 'container' });
+try {
+  const info = await copy.inspect();
+  const plan = await copy.plan({
+    keepRanges: [{ start: info.startTime, end: info.endTime }], snap: 'strict',
+  });
+  console.log(plan.warnings, plan.omittedVideoPackets, plan.adjustedVideoPackets);
+  const result = await copy.exportMp4({ plan });
+  // result.blobを保存。result.warningsにも採用した計画の警告が入る。
+} finally { await copy.close(); }
+```
+
+`container`はMP4の同期サンプルを境界として使います。独立復号の証明に関する下記の問題を警告に変え、
+コピーを続行します。自動再試行や自動再圧縮はありません。Open GOPの参照画像不足などによって
+切断直後の映像が乱れる可能性があり、出力成功は再生品質の保証ではありません。
+`supported:true`も選択したモードで処理可能という意味です。
+
+`validation`と変更不可の`warnings`はinfo・plan・resultに含まれます。
+通常モードで検出する境界は`idr`、強行モードでは実際にIDRであっても`sync`と表示します。
+`findBoundaries`・`plan`・`exportMp4`はセッションの同じ設定を引き継ぎます。
+`snap:'strict'`は境界との完全一致を指す別の設定で、`validation:'container'`とも組み合わせられます。
+
+| warning.code | 続行する条件／処理 |
+|---|---|
+| CONTAINER_SYNC_UNVERIFIED | 強行モードであることを常に通知 |
+| SYNC_IDR_MISMATCH | MP4同期フラグと実際のIDRが不一致（Open GOP等） |
+| FRAME_NUMBER_DISCONTINUITY | gap許可SPSでフレーム番号の連続性を確認できない |
+| SLICE_LAYOUT_UNVERIFIED | 先頭／順番から完全なスライス配置を確認できない |
+| REDUNDANT_PICTURE | 冗長画像を含む |
+| IDR_DISCARDS_PRIOR_PICTURES | IDRが先行画像を表示しない指定を持つ |
+| GOP_TIMING_MISMATCH | GOP復号時間と表示境界が一致しない |
+| GOP_PRESENTATION_CROSSING | GOPの表示時刻が境界をまたぐ |
+| LEADING_PICTURE | 同期サンプルより前に表示する画像がある |
+| PACKETS_OMITTED | 保持区間外の表示時刻のパケットを省略 |
+| PACKET_DURATION_ADJUSTED | 区間末尾のパケット時間を調整 |
+| DIAGNOSTICS_TRUNCATED | 将来の診断種類追加などで上限を超えた種類を集約 |
+
+警告はコードごとに集約し、配列は最大32件です。`severity:'warning'`、`recoverableInContainer:true`、
+`message`、発生回数`count`を持ちます。該当時は`firstTime/lastTime`（元ファイルの秒）、
+`firstRangeIndex/lastRangeIndex`（0始まり）も返します。first/lastは検出順で、Bフレームでは時刻順とは限りません。
+時間調整には最初の例の`originalDuration/outputDuration`（秒）を添えます。
+infoの警告は入力全体、planの警告はそれらに保持区間の処理結果を加えたものです。
+
+強行モードの区間端の処理は次のとおりです。
+
+1. 開始syncから終了syncの直前（またはEOF）までを元の復号順で読みます。
+2. その中で表示時刻が`[sourceStart,sourceEnd)`の外にあるパケットを省略します。隣接GOPから画像を補いません。
+3. 残った最後の復号パケットと最後の表示パケットのdurationを、最後の表示時刻から区間末尾までの長さへ揃えます。同一パケットは1件と数えます。
+4. 元の圧縮ペイロード・残ったパケットの復号順を保持し、表示時刻を出力区間へ移します。参照画像の修復は行いません。
+
+省略／時間調整の件数は各range・plan・resultの`omittedVideoPackets/adjustedVideoPackets`にあります。
+`videoPackets`は省略後の出力件数、音声のサンプル数は調整後の区間時間から計算します。
+通常モードのこれらの件数は0で、従来の末尾時間処理を維持します。
+
+**強行モードでも停止するもの:** 読み取れないNAL／ヘッダー、SPS/PPS・sample descriptionの変更、
+重複・負値・ゼロ長などの不正な時刻、無効な復号順、開始syncなし、非対応コンテナ／コーデック／表示構造、
+不正な範囲・別セッションの計画、PCMの不足や形式不一致、容量上限、保存失敗、中止。
+インターレース・FMO・POC type 1等の非対応形式も引き続き停止します。
+警告が出た後もNALおよびSPS/PPS検査を続け、検査器全体を無効化する処理はありません。
+
 ## planと音声の時間対応
 
 保持区間は元の時刻の`[start,end)`で、有限値・時刻順・重複なし・映像の有効範囲内です。
-`strict`は安全な境界との一致を要求し、`inside`は開始を後ろ、終了を前の境界へ縮めます。
+`strict`は選択モードの境界との一致を要求し、`inside`は開始を後ろ、終了を前の境界へ縮めます。
 一致判定の許容差は浮動小数点演算のノイズ程度です。`info.boundaries`の時刻をそのまま使えます。
 空になった区間は`EMPTY_RANGE`と0始まりの`rangeIndex`を伴うエラーです。黙って捨てません。
 
@@ -84,7 +152,7 @@ Open GOP、同期フラグ不整合、構成変更、複数sample description、
 | requestedStart / requestedEnd | アプリが要求した区間 |
 | sourceStart / sourceEnd | 実際に保持する元区間 |
 | startAdjustment / endAdjustment | 実際の時刻−要求時刻 |
-| startBoundaryId / endBoundaryId | 採用した安全な境界 |
+| startBoundaryId / endBoundaryId | 選択モードで採用した境界 |
 | outputStart / outputEnd | 完成動画上の時刻 |
 | audioStartSample / audioEndSample / audioSamples | 完成音声上の位置・区間サンプル数 |
 
@@ -128,6 +196,10 @@ AACの進行中add/init/finalizeは決着を待ってから後始末します。
 `fps`、リサイズ、映像ビットレート等の再圧縮設定を渡すと`CONFLICTING_OPTIONS`になります。
 
 `VideoCopyError extends MediaError`には既存codeに加えてreasonと必要時rangeIndexがあります。
+`severity:'error'`、`diagnosticCode`、`recoverableInContainer`も返します。
+通常モードで上表の証明関連エラーが出た場合は`recoverableInContainer:true`となり、
+アプリは明示的な強行設定で新しいセッションを作れます。その他のVideoCopyErrorはfalseです。
+一般のMediaError（保存失敗・中止等）はこの追加情報を持たない場合があります。
 主なreasonはCONTAINER、CODEC、CONFIGURATION_CHANGE、GOP_STRUCTURE、DISPLAY_METADATA、TIMELINE、
 NO_SAFE_BOUNDARY、EMPTY_RANGE、INVALID_RANGE、PLAN_MISMATCH、PCM_LENGTH、PCM_FORMAT、LIMITです。
 索引は最大400万パケット、1パケット32 MiB、メタデータ読取1回64 MiB、時間単位は最大100万tick/sです。

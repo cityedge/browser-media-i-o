@@ -4,16 +4,17 @@ const text = (ja, en) => $('lang').value === 'ja' ? ja : en;
 function language() { document.documentElement.lang = $('lang').value; document.querySelectorAll('[data-ja]').forEach(el => { el.textContent = el.dataset[$('lang').value]; }); }
 $('lang').onchange = language; language();
 function invalidate() { plan = undefined; $('blob').disabled = $('stream').disabled = true; $('download').hidden = $('preview').hidden = true; if (url) URL.revokeObjectURL(url); }
-for (const id of ['ranges', 'audio', 'bitrate']) $(id).oninput = invalidate;
+for (const id of ['ranges', 'audio', 'bitrate', 'validation']) $(id).oninput = invalidate;
+$('validation').onchange = () => { invalidate(); $('force-warning').hidden = $('validation').value !== 'container'; };
 $('file').onchange = async () => { invalidate(); await session?.close(); source?.close(); session = source = undefined; $('inspect').disabled = !$('file').files.length; };
 $('cancel').onclick = () => controller?.abort();
-function busy(value) { for (const id of ['file', 'ranges', 'audio', 'bitrate', 'inspect']) $(id).disabled = value; $('cancel').disabled = !value; $('blob').disabled = $('stream').disabled = value || !plan; }
+function busy(value) { for (const id of ['file', 'ranges', 'audio', 'bitrate', 'validation', 'inspect']) $(id).disabled = value; $('cancel').disabled = !value; $('blob').disabled = $('stream').disabled = value || !plan; }
 const progress = p => { $('status').textContent = `${p.stage}: ${p.fraction === null ? '…' : (p.fraction * 100).toFixed(1) + '%'}\n${p.videoPackets} video / ${p.audioSamples} PCM`; };
 $('inspect').onclick = async () => {
   invalidate(); controller = new AbortController(); busy(true);
   try {
     await session?.close(); source?.close();
-    const file = $('file').files[0]; session = await BrowserMediaIO.openVideoCopy(file); source = await BrowserMediaIO.openMedia(file);
+    const file = $('file').files[0]; session = await BrowserMediaIO.openVideoCopy(file, { validation: $('validation').value }); source = await BrowserMediaIO.openMedia(file);
     const media = await source.probe(), info = await session.inspect({ signal: controller.signal, onProgress: progress });
     audioInfo = media.tracks.find(t => t.audio)?.audio;
     if ($('audio').value === 'pcm' && !audioInfo) throw Error(text('音声トラックがありません。音声なしを選んでください。', 'No audio track. Select no audio.'));

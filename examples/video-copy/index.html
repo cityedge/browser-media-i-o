@@ -7,8 +7,10 @@
 <style>pre{max-height:480px;overflow:auto}video{display:block;width:100%;margin-top:16px}[hidden]{display:none!important}</style>
 <select id="lang" aria-label="Language"><option value="ja">日本語</option><option value="en">English</option></select>
 <h1 data-ja="映像を再圧縮せずにカット" data-en="Cut video without re-encoding"></h1>
-<p data-ja="保持区間を安全な境界へ縮め、計画を確認してから保存します。音声は元のサンプルレートでAACに変換します。" data-en="Shrink keep ranges to safe boundaries, review the plan, then save. Audio is encoded as AAC at its original sample rate."></p>
+<p data-ja="保持区間を選択モードの境界へ縮め、計画を確認してから保存します。音声は元のサンプルレートでAACに変換します。" data-en="Shrink keep ranges to the selected mode’s boundaries, review the plan, then save. Audio is encoded as AAC at its original sample rate."></p>
 <label for="file" data-ja="元のMP4" data-en="Source MP4"></label><input id="file" type="file" accept="video/mp4">
+<label for="validation" data-ja="映像の検証" data-en="Video validation"></label><select id="validation"><option value="strict" data-ja="通常：独立した復号を検証" data-en="Strict: verify independent decoding"></option><option value="container" data-ja="強行：警告があっても出力" data-en="Force: export despite warnings"></option></select>
+<p id="force-warning" hidden role="status" data-ja="MP4の同期サンプルを境界として使用します。切断位置で映像が乱れる場合があります。省略・時間調整の件数と警告を計画で確認してください。破損や形式変更など、処理不能なエラーでは停止します。" data-en="Use MP4 sync samples as boundaries. Cuts may have visual artifacts. Review warnings and omitted or adjusted packet counts in the plan. Unreadable data and configuration changes still stop export."></p>
 <label for="ranges" data-ja="保持区間（秒、JSON）" data-en="Keep ranges (seconds, JSON)"></label><textarea id="ranges">[{"start":0,"end":10}]</textarea>
 <label for="audio" data-ja="音声" data-en="Audio"></label><select id="audio"><option value="pcm" data-ja="元音声をAACへ" data-en="Source audio to AAC"></option><option value="none" data-ja="音声なし" data-en="No audio"></option></select>
 <label for="bitrate" data-ja="AACビットレート（kbps）" data-en="AAC bitrate (kbps)"></label><input id="bitrate" type="number" min="32" max="320" value="80">

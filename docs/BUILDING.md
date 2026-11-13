@@ -79,6 +79,19 @@ HTTPS試験の一時証明書生成にはWindowsのPowerShell/.NETを使用し�
 結果は `tests/tmp/video-copy/`、長尺は `tests/tmp/video-copy-long/` に保存します。
 試験内容と対応範囲は [0.6.0検証記録](VALIDATION_0.6.0.md) を参照してください。
 
+0.6.1では`test:video-copy`と`npm test`にSPSのgap許可／実際の不連続の回帰試験を含めています。
+ビルド後の `node scripts/test-video-copy-zoom.mjs "入力MP4のパス"` は任意の実素材で、全映像コピーと元音声を0.5倍に加工した区間連結を検査します。
+既定の区間は約81分の検証素材向けです。別の長さの素材にはスクリプト内の区間指定を調整してください。
+`--short`は先頭・中間・末尾の短い保持区間で音声付き出力を検査します。実素材は読み取り専用で、生成物はtests/tmp/zoom-copy-*へ保存します。
+素材本体・変換後メディア・詳細レポートは公開パッケージへ含めません。[0.6.1検証記録](VALIDATION_0.6.1.md)。
+
+0.7.0では`npm test`と`test:video-copy`に`test-video-copy-container.mjs`を追加しています。
+単独実行時は先にビルドと`node scripts/test-video-copy-gaps.mjs`を実行してください。
+強行コピーのペイロード・PTS・省略／時間調整、警告後の設定変更／破損の停止、PCM同期、
+file://の通常／強行切り替えとpublic Workerを確認します。結果は`tests/tmp/video-copy-container/`です。
+[0.7.0検証記録](VALIDATION_0.7.0.md)を参照してください。
+強行試験の`--https`はローカルHTTPSで実行します。実素材試験の`--container`は強行モードを選択し、別の結果フォルダーへ保存します。
+
 ## アプリ実装例
 
 `npm run app:dev` でFramecraftをlocalhost:4174に起動できます。

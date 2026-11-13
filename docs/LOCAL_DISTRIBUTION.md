@@ -3,12 +3,15 @@
 この配布形式は、利用アプリが自分のindex.htmlを直接開いて動くためのライブラリです。
 同梱サンプルのUIを採用する必要はありません。
 
+0.7.0にはZoom録画のSPS gap許可フラグの検査修正と、明示的な強行コピー設定が含まれます。
+ZIPの名前は`browser-media-io-browser-0.7.0.zip`です。
+
 0.6.0では、映像を再圧縮しないカット・連結と加工済みPCMのAAC出力を追加しています。
 利用手順は同梱の`VIDEO_COPY.md`、動く例は`examples/video-copy/index.html`です。
 
 ## 配置するファイル
 
-`browser-media-io-browser-0.6.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
+`browser-media-io-browser-0.7.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
 再配布時は通知・ライセンス・対応ソースの案内も保持してください。
 
 | ファイル | グローバル名 | 入力終了の契約 |
@@ -102,7 +105,7 @@ npm ci
 npm run package:browser
 ```
 
-通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.6.0.zip`。
+通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.7.0.zip`。
 対応ソースZIPは `npm run package:sources` で別途生成します。
 利用者のPCにはNode.js・サーバー・ネット接続は不要です。
 

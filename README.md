@@ -5,6 +5,12 @@ WebアプリにMP4・MP3・WAVの読み取り、映像フレーム／PCMの取�
 
 **[通常HTMLに組み込む](docs/LOCAL_DISTRIBUTION.md)** · [npm版の導入](docs/GETTING_STARTED.md) · [API](docs/API.md) · [変更履歴](CHANGELOG.md)
 
+0.7.0では、明示的な`validation:'container'`で警告があっても映像コピーを出力できます。
+同期サンプル境界、警告、省略・時間調整件数を返します。既定は従来の厳格検査です。[設定と制約](docs/VIDEO_COPY.md)。
+Zoom録画をSPSのgap許可フラグだけで拒否する問題も修正しました。
+81分26秒の実録画で全映像コピーと音声加工付き出力を確認しています。[0.6.1の検証記録](docs/VALIDATION_0.6.1.md)。
+[0.7.0の検証記録](docs/VALIDATION_0.7.0.md)と[Release](https://github.com/cityedge/browser-media-i-o/releases/tag/v0.7.0)を参照してください。
+
 0.6.0では、[H.264映像の無再圧縮カット・連結と加工済みPCMのAAC出力](docs/VIDEO_COPY.md)を追加しました。
 動作範囲と測定条件は[0.6.0の検証記録](docs/VALIDATION_0.6.0.md)を参照してください。
 
@@ -30,10 +36,10 @@ AACのWASMとMP3 Workerも同梱済みです。利用時にNode.js・ローカ�
 
 | 導入方法 | 利用するもの |
 |---|---|
-| 通常HTML・file://起動 | `browser-media-io-browser-0.6.0.zip` のJS。ビルド時は `dist/browser/` |
-| npm / バンドラー | `browser-media-io-0.6.0.tgz`。ES Modules・型定義を含む |
-| MP3出力だけを追加 | `browser-mp3-0.6.0.zip` の `browser-mp3.js` |
-| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.6.0.zip` |
+| 通常HTML・file://起動 | `browser-media-io-browser-0.7.0.zip` のJS。ビルド時は `dist/browser/` |
+| npm / バンドラー | `browser-media-io-0.7.0.tgz`。ES Modules・型定義を含む |
+| MP3出力だけを追加 | `browser-mp3-0.7.0.zip` の `browser-mp3.js` |
+| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.7.0.zip` |
 
 [公開済み配布物はGitHub Releases](https://github.com/cityedge/browser-media-i-o/releases)にあります。
 ソースからの生成には下記コマンドを使用してください。
@@ -103,7 +109,7 @@ npm run check:distribution # 公開ファイル・文書リンク・npm収録範
 デスクトップChrome / Edgeを中心に検証しています。Safari・Firefox・モバイルは未検証です。
 利用可能なコーデックはOS・ブラウザ・設定に依存します。
 file://でのBlob保存、2時間合成素材の映像コピーと位置指定ストリーム出力、HTTPSでの実FileSystemWritableFileStreamを検証しています。
-保存先選択ダイアログの操作そのものと、実際の81分の会議素材は未検証です。[測定条件](docs/VALIDATION_0.6.0.md)を参照してください。
+保存先選択ダイアログの操作そのものは未検証です。[0.6.0の測定条件](docs/VALIDATION_0.6.0.md)も参照してください。
 サンプル画面の60秒・128 MiBという上限はサンプル固有で、ライブラリ全体の固定上限ではありません。
 
 本体はMIT。依存はMPL-2.0やLGPLなどの別ライセンスです。

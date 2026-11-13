@@ -1,5 +1,6 @@
 // Conservative AVC access-unit validation. No pixel decoding and no changes to the bitstream.
-import { copyFail } from './video-copy-errors.js';
+import { copyFail, copyProofFail } from './video-copy-errors.js';
+import type { VideoCopyDiagnosticCode } from './video-copy-diagnostics.js';
 const bad = (message: string): never => copyFail('GOP_STRUCTURE', message);
 class Bits {
   byte = 1; bit = 0;
@@ -18,7 +19,7 @@ class Bits {
   ue(): number { let n = 0; while (!this.read()) if (++n > 30) bad('Invalid Exp-Golomb code.'); return 2 ** n - 1 + this.read(n); }
   se(): number { const x = this.ue(); return x % 2 ? (x + 1) / 2 : -x / 2; }
 }
-type Sps = { frameBits: number; poc: number; pocBits: number };
+type Sps = { frameBits: number; poc: number; pocBits: number; gapsAllowed: boolean };
 type Pps = { sps: Sps; bottom: number; redundant: number };
 const equal = (a: Uint8Array, b: Uint8Array) => a.length === b.length && a.every((x, i) => x === b[i]);
 export class AvcCopyValidator {
@@ -27,7 +28,8 @@ export class AvcCopyValidator {
   private sps = new Map<number, Sps>();
   private pps = new Map<number, Pps>();
   private parameters: Uint8Array[] = [];
-  constructor(description: Uint8Array) {
+  private previousReferenceFrame: number | undefined;
+  constructor(description: Uint8Array, private readonly warn?: (code: VideoCopyDiagnosticCode, message: string) => void) {
     if (description.length < 7 || description[0] !== 1) bad('An AVC configuration record is required.');
     this.lengthSize = (description[4] & 3) + 1;
     if (this.lengthSize === 3) bad('Invalid AVC NAL length size.');
@@ -60,7 +62,7 @@ export class AvcCopyValidator {
       if (frameBits > 16) bad('Invalid AVC frame number size.');
       if (poc === 0) { pocBits = b.ue() + 4; if (pocBits > 16) bad('Invalid AVC picture order size.'); }
       else if (poc !== 2) bad('Picture order count type 1 is not supported.');
-      b.ue(); if (b.read()) bad('Frame number gaps are not supported.');
+      b.ue(); const gapsAllowed = !!b.read();
       b.ue(); b.ue(); if (!b.read()) bad('Interlaced AVC is not supported.');
       b.read(); // direct_8x8_inference_flag
       if (b.read()) { b.ue(); b.ue(); b.ue(); b.ue(); } // cropping
@@ -71,7 +73,7 @@ export class AvcCopyValidator {
         if (idc && (!ratio || !ratio[0] || !ratio[1])) bad('Unsupported AVC sample aspect ratio.');
         if (ratio) this.pixelAspectRatio = { num: ratio[0], den: ratio[1] };
       }
-      this.sps.set(id, { frameBits, poc, pocBits });
+      this.sps.set(id, { frameBits, poc, pocBits, gapsAllowed });
     }
     const ppsCount = description[at++];
     if (ppsCount !== 1) copyFail('CONFIGURATION_CHANGE', 'Exactly one PPS is supported.');
@@ -85,8 +87,12 @@ export class AvcCopyValidator {
       this.pps.set(id, { sps: sps!, bottom, redundant: b.read() });
     }
   }
+  private unverified(code: VideoCopyDiagnosticCode, message: string) {
+    if (this.warn) this.warn(code, message); else copyProofFail(code, message);
+  }
   inspect(data: Uint8Array): boolean {
     let at = 0, slices = 0, idr: boolean | undefined, picture = '', lastMb = -1;
+    let referenceFrame: number | undefined;
     while (at < data.length) {
       if (at + this.lengthSize > data.length) bad('Truncated NAL length.');
       let size = 0; for (let j = 0; j < this.lengthSize; j++) size = size * 256 + data[at++];
@@ -99,16 +105,24 @@ export class AvcCopyValidator {
       } else if (type === 1 || type === 5) {
         const b = new Bits(nal), mb = b.ue(), slice = b.ue(), ppsId = b.ue(), pps = this.pps.get(ppsId);
         if (!pps || slice > 9 || ![0, 1, 2].includes(slice % 5)) bad('Unsupported slice or parameter set.');
-        if ((!slices && mb !== 0) || mb <= lastMb) bad('Incomplete picture or arbitrary slice ordering.');
+        if ((!slices && mb !== 0) || mb <= lastMb) this.unverified('SLICE_LAYOUT_UNVERIFIED', 'Incomplete picture or arbitrary slice ordering.');
         lastMb = mb;
         const s = pps!.sps, frame = b.read(s.frameBits), isIdr = type === 5;
+        // An SPS permission is not evidence of an actual gap. For this newly accepted
+        // subset, check each picture against the previous reference picture (H.264 7.4.3).
+        // MMCO-5 resets requiring deeper slice parsing remain conservatively unsupported.
+        if (!slices && s.gapsAllowed && !isIdr && this.previousReferenceFrame !== undefined
+          && frame !== this.previousReferenceFrame && frame !== (this.previousReferenceFrame + 1) % (2 ** s.frameBits)) {
+          this.unverified('FRAME_NUMBER_DISCONTINUITY', 'Frame number discontinuity requires unsupported gap or MMCO reset handling.');
+        }
+        if (nal[0] & 96) referenceFrame = frame;
         const id = isIdr ? b.ue() : -1;
         let poc = 0, delta = 0;
         if (s.poc === 0) { poc = b.read(s.pocBits); if (pps!.bottom) delta = b.se(); }
-        if (pps!.redundant && b.ue() !== 0) bad('Redundant pictures are unsupported.');
+        if (pps!.redundant && b.ue() !== 0) this.unverified('REDUNDANT_PICTURE', 'Redundant pictures are unsupported.');
         if (isIdr) {
           if (slice % 5 !== 2 || frame !== 0 || !(nal[0] & 96)) bad('Invalid IDR picture.');
-          if (b.read()) bad('IDR discards pending pictures (no_output_of_prior_pics_flag).');
+          if (b.read()) this.unverified('IDR_DISCARDS_PRIOR_PICTURES', 'IDR discards pending pictures (no_output_of_prior_pics_flag).');
           b.read();
         }
         const key = `${ppsId}/${frame}/${poc}/${delta}/${id}/${isIdr}`;
@@ -117,6 +131,7 @@ export class AvcCopyValidator {
       } else if (![6, 9, 12].includes(type)) bad(`Unsupported AVC NAL type ${type}.`);
     }
     if (!slices) bad('Sample contains no complete coded picture.');
+    if (referenceFrame !== undefined) this.previousReferenceFrame = referenceFrame;
     return idr!;
   }
 }
