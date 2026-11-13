@@ -53,7 +53,7 @@ npm run test:local
 npm run check:distribution
 ```
 
-npm testはWeb 68件・Framecraft 6件を実行し、Viteの起動・終了を自動管理します。
+npm testはWeb 90件・Framecraft 6件と映像コピーの統合試験を実行し、Viteの起動・終了を自動管理します。
 VBR/CBR/CQPの対応確認、実際のエンコーダー設定、FFprobeによる映像パケットサイズの独立検査を含みます。
 test:localは実際の軽量ZIPを新しい日本語・空白パスへ展開し、サーバーなし・オフラインでfile://へ遷移します。
 ネイティブAACとWASM AACを分けて試験します。両経路を確認するためネイティブAAC対応のWindows Chrome/Edgeを使用してください。
@@ -71,6 +71,13 @@ npm run test:local
 集計は `node scripts/collect-validation.mjs` でoutput/validation/に保存できます。
 MEDIA_REPORT_DIRで変更可能です。既存の版別検証記録を上書きしない場所を指定してください。
 30分出力・性能測定は `npm run test:release` で別途実行します。
+
+映像コピーだけの試験は `npm run test:video-copy`、2時間素材の逐次出力は `npm run test:video-copy:long` です。
+ビルド後の `node scripts/test-video-copy.mjs --https` は、ローカルHTTPSで実FileSystemWritableFileStreamへの保存も確認します。
+HTTPS試験の一時証明書生成にはWindowsのPowerShell/.NETを使用し、証明書ストアは変更しません。
+`VIDEO_COPY_BUNDLE_DIR` に展開した通常script版のルートを指定すると、その配布物を試験できます。
+結果は `tests/tmp/video-copy/`、長尺は `tests/tmp/video-copy-long/` に保存します。
+試験内容と対応範囲は [0.6.0検証記録](VALIDATION_0.6.0.md) を参照してください。
 
 ## アプリ実装例
 

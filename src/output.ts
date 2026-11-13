@@ -34,7 +34,8 @@ export interface Mp4Result {
 }
 
 // Fixed-size pages support MP4's positioned writes without a growing contiguous ArrayBuffer.
-class PagedBytes {
+/** @internal Shared positioned Blob storage; not exported by the public entry points. */
+export class PagedBytes {
   readonly pageSize = 1024 * 1024;
   readonly pages: Uint8Array<ArrayBuffer>[] = [];
   size = 0;

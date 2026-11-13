@@ -34,9 +34,11 @@ const html = (await readFile(path.join(root, 'examples/local/index.html'), 'utf8
   .replace('href="./README.md"', 'href="../../README.md"')
   .replace('href="./THIRD_PARTY_NOTICES.md"', 'href="../../THIRD_PARTY_NOTICES.md"');
 await writeFile(path.join(example, 'index.html'), html);
+await cp(path.join(root, 'examples/video-copy'), path.join(output, 'examples/video-copy'), { recursive: true });
 for (const file of ['LICENSE.md', 'THIRD_PARTY_NOTICES.md']) await cp(path.join(root, file), path.join(output, file));
 await cp(path.join(root, 'docs/LOCAL_DISTRIBUTION.md'), path.join(output, 'README.md'));
 await cp(path.join(root, 'docs/SOURCES.md'), path.join(output, 'SOURCES.md'));
+await cp(path.join(root, 'docs/VIDEO_COPY.md'), path.join(output, 'VIDEO_COPY.md'));
 await mkdir(path.join(output, 'licenses'), { recursive: true });
 for (const [source, target] of [
   ['node_modules/mediabunny/LICENSE', 'Mediabunny-MPL-2.0.txt'],

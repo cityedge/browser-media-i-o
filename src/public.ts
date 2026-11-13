@@ -9,4 +9,5 @@ export { createMp4Writer, renderMp4, type Mp4Writer,
 
 export type { MediaReader } from './reader.js';
 export type { PcmAudio, PcmBlock } from './pcm.js';
+export * from './video-copy.js';
 export type { ReadOptions, RangeReadOptions, AudioReadOptions, RequestedVideoFrame } from './input-core.js';

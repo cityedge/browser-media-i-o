@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Browser Media I/O — Video copy</title>
+<style>
+:root{color-scheme:dark;font:16px/1.6 system-ui;background:#10141c;color:#e7ecf3}body{max-width:850px;margin:40px auto;padding:0 24px}h1{font-size:28px}label{display:block;margin:18px 0 6px}input,select,textarea,button{font:inherit;background:#202a39;color:inherit;border:1px solid #566377;border-radius:6px;padding:8px}textarea{box-sizing:border-box;width:100%;height:110px}button{margin:18px 8px 0 0;cursor:pointer}button:disabled{opacity:.4}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#182130;padding:16px}a{color:#9dc7ff}video{max-width:100%}
+</style>
+<style>pre{max-height:480px;overflow:auto}video{display:block;width:100%;margin-top:16px}[hidden]{display:none!important}</style>
+<select id="lang" aria-label="Language"><option value="ja">日本語</option><option value="en">English</option></select>
+<h1 data-ja="映像を再圧縮せずにカット" data-en="Cut video without re-encoding"></h1>
+<p data-ja="保持区間を安全な境界へ縮め、計画を確認してから保存します。音声は元のサンプルレートでAACに変換します。" data-en="Shrink keep ranges to safe boundaries, review the plan, then save. Audio is encoded as AAC at its original sample rate."></p>
+<label for="file" data-ja="元のMP4" data-en="Source MP4"></label><input id="file" type="file" accept="video/mp4">
+<label for="ranges" data-ja="保持区間（秒、JSON）" data-en="Keep ranges (seconds, JSON)"></label><textarea id="ranges">[{"start":0,"end":10}]</textarea>
+<label for="audio" data-ja="音声" data-en="Audio"></label><select id="audio"><option value="pcm" data-ja="元音声をAACへ" data-en="Source audio to AAC"></option><option value="none" data-ja="音声なし" data-en="No audio"></option></select>
+<label for="bitrate" data-ja="AACビットレート（kbps）" data-en="AAC bitrate (kbps)"></label><input id="bitrate" type="number" min="32" max="320" value="80">
+<div><button id="inspect" disabled data-ja="解析・計画" data-en="Inspect & plan"></button><button id="blob" disabled data-ja="Blobで保存" data-en="Save Blob"></button><button id="stream" disabled data-ja="ファイルへ直接保存" data-en="Save directly to file"></button><button id="cancel" disabled data-ja="中止" data-en="Cancel"></button></div>
+<pre id="status" aria-live="polite"></pre><a id="download" hidden data-ja="MP4をダウンロード" data-en="Download MP4"></a><video id="preview" controls hidden></video>
+<script src="../../browser-media-io.js"></script><script src="./pcm.js"></script><script src="./app.js"></script></html>

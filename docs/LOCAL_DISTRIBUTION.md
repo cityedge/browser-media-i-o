@@ -3,9 +3,12 @@
 この配布形式は、利用アプリが自分のindex.htmlを直接開いて動くためのライブラリです。
 同梱サンプルのUIを採用する必要はありません。
 
+0.6.0では、映像を再圧縮しないカット・連結と加工済みPCMのAAC出力を追加しています。
+利用手順は同梱の`VIDEO_COPY.md`、動く例は`examples/video-copy/index.html`です。
+
 ## 配置するファイル
 
-`browser-media-io-browser-0.5.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
+`browser-media-io-browser-0.6.0.zip` を展開し、次のJSのどちらか一つを利用アプリへコピーします。
 再配布時は通知・ライセンス・対応ソースの案内も保持してください。
 
 | ファイル | グローバル名 | 入力終了の契約 |
@@ -99,14 +102,16 @@ npm ci
 npm run package:browser
 ```
 
-通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.5.0.zip`。
+通常script版は `dist/browser/`、軽量ZIPは `output/releases/browser-media-io-browser-0.6.0.zip`。
 対応ソースZIPは `npm run package:sources` で別途生成します。
 利用者のPCにはNode.js・サーバー・ネット接続は不要です。
 
 Windows Chrome/Edgeで、ZIPを日本語・空白パスに展開して初回からオフラインで試験しています。
 試験コマンドは `npm run test:local`。ブラウザはPLAYWRIGHT_CHROMIUM_EXECUTABLE_PATHで指定します。
 管理ポリシーでfile://が拒否される環境は、制限を緩和せず失敗として記録します。
-Safari/Firefox/モバイル、長尺file://出力は未検証です。
+Safari/Firefox/モバイルは未検証です。
+0.6.0の映像コピー経路では2時間の合成素材をfile://から逐次出力して検証しています。
+保存先選択ダイアログの自動操作は対象外で、位置指定ストリームの検証とは区別しています。
 
 English: Copy either classic JS bundle into your application and load it with a regular script tag.
 Your own index.html can run from file:// without a local server, Node.js, CDN, or runtime downloads.

@@ -5,6 +5,9 @@ WebアプリにMP4・MP3・WAVの読み取り、映像フレーム／PCMの取�
 
 **[通常HTMLに組み込む](docs/LOCAL_DISTRIBUTION.md)** · [npm版の導入](docs/GETTING_STARTED.md) · [API](docs/API.md) · [変更履歴](CHANGELOG.md)
 
+0.6.0では、[H.264映像の無再圧縮カット・連結と加工済みPCMのAAC出力](docs/VIDEO_COPY.md)を追加しました。
+動作範囲と測定条件は[0.6.0の検証記録](docs/VALIDATION_0.6.0.md)を参照してください。
+
 ## ローカルサーバーなしで使う
 
 0.3.0以降の通常script版は、**このライブラリを使うアプリ自身のindex.htmlを直接開く**構成に対応します。
@@ -27,13 +30,13 @@ AACのWASMとMP3 Workerも同梱済みです。利用時にNode.js・ローカ�
 
 | 導入方法 | 利用するもの |
 |---|---|
-| 通常HTML・file://起動 | `browser-media-io-browser-0.5.0.zip` のJS。ビルド時は `dist/browser/` |
-| npm / バンドラー | `browser-media-io-0.5.0.tgz`。ES Modules・型定義を含む |
-| MP3出力だけを追加 | `browser-mp3-0.5.0.zip` の `browser-mp3.js` |
-| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.5.0.zip` |
+| 通常HTML・file://起動 | `browser-media-io-browser-0.6.0.zip` のJS。ビルド時は `dist/browser/` |
+| npm / バンドラー | `browser-media-io-0.6.0.tgz`。ES Modules・型定義を含む |
+| MP3出力だけを追加 | `browser-mp3-0.6.0.zip` の `browser-mp3.js` |
+| 変更・再ビルド | このリポジトリ、または対応する `browser-media-io-sources-0.6.0.zip` |
 
 [公開済み配布物はGitHub Releases](https://github.com/cityedge/browser-media-i-o/releases)にあります。
-上表は0.5.0の配布物名です。ソースからの生成には下記コマンドを使用してください。
+ソースからの生成には下記コマンドを使用してください。
 
 MP4映像はVBR・CBR・CQPとエンコーダー優先を指定でき、出力結果から実測平均映像ビットレートを取得できます。
 設定例と制約は[映像のレート制御](docs/API.md#映像のレート制御040以降)を参照してください。
@@ -51,6 +54,7 @@ npmレジストリには公開していません。
 | `decodeAudio(file)` | 音声の全デコードと実サンプル数の取得 |
 | `renderMp4(options)` | Canvas描画と音声から固定fpsのMP4を生成 |
 | `createMp4Writer(options)` | 映像・PCMを逐次渡してMP4を生成 |
+| `openVideoCopy(file)` | 安全な区間を計画し、映像コピー＋加工済みPCMでMP4を生成（0.6.0） |
 | `enableAacFallback(options)` | 必要時に同梱／追加インストールしたAAC拡張を有効化 |
 | `wavToMp3(wav)` / `encodeMp3(audio)` | 完成済み音声をMP3に変換 |
 
@@ -82,7 +86,7 @@ npm run package:release   # npm・MP3・対応ソースを含むRelease用ファ
 - [Framecraft](docs/FRAMECRAFT.md)：画像・動画・音声・字幕を組み合わせるアプリ実装例。Viteで動作します。
 
 ```sh
-npm test                 # 型検査・入出力90件・アプリ6件
+npm test                 # 型検査・入出力90件・アプリ6件・映像コピー
 npm run test:local       # 実際の軽量ZIPを展開し、file://・オフラインで検証
 npm run check:distribution # 公開ファイル・文書リンク・npm収録範囲を検査
 ```
@@ -98,7 +102,8 @@ npm run check:distribution # 公開ファイル・文書リンク・npm収録範
 
 デスクトップChrome / Edgeを中心に検証しています。Safari・Firefox・モバイルは未検証です。
 利用可能なコーデックはOS・ブラウザ・設定に依存します。
-file://で確認した保存方法はBlobダウンロードです。長尺file://出力と直接ファイルストリーム保存は未検証です。
+file://でのBlob保存、2時間合成素材の映像コピーと位置指定ストリーム出力、HTTPSでの実FileSystemWritableFileStreamを検証しています。
+保存先選択ダイアログの操作そのものと、実際の81分の会議素材は未検証です。[測定条件](docs/VALIDATION_0.6.0.md)を参照してください。
 サンプル画面の60秒・128 MiBという上限はサンプル固有で、ライブラリ全体の固定上限ではありません。
 
 本体はMIT。依存はMPL-2.0やLGPLなどの別ライセンスです。

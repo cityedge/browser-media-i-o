@@ -28,11 +28,11 @@ MP3を使うアプリだけが明示的にimportします。どちらの関数�
 
 ## 通常のHTMLへの組み込み
 
-MP3専用の `browser-mp3-0.5.0.zip`、またはビルドで生成した `dist/standalone/` を使用します。
+MP3専用の `browser-mp3-0.6.0.zip`、またはビルドで生成した `dist/standalone/` を使用します。
 エンコーダーを含む `browser-mp3.js` と、WAV/MP3の切り替えを試せる `index.html` が入っています。
 JavaScriptファイルは約187 KB（圧縮済みJS、gzip未適用）。実行時のnpmインストールやCDNは不要です。
 MP3専用ZIPにはライセンス文書とソースの入手案内を含めています。
-変更・再ビルド用ソースは、同じReleaseの `browser-media-io-sources-0.5.0.zip` に分離しています。
+変更・再ビルド用ソースは、同じReleaseの `browser-media-io-sources-0.6.0.zip` に分離しています。
 利用アプリでの実行にソースZIPは不要です。
 
 ```html
